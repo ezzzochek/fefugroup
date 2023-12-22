@@ -1,0 +1,35 @@
+\chapter*{Принципиальная схема усилителя}
+\begin{figure}[ht]
+\centering
+\begin{circuitikz}[european]
+\draw (0,0) node[nmos,tr circle](Q1){Q1};
+\draw (Q1.S) to[R, l2^=$R_S$ and \SI{5}{k\ohm}] ++(0,-3) node[vee](VEE){$V_{EE}=\SI
+{-10}{V}$}; %define VEE level
+\draw (Q1.S) to[short] ++(2,0) to[C=$C_1$] ++(0,-1.5) node[ground](GND){};
+\draw (Q1.G) to[short] ++(-1,0) coordinate(in) to[R, l2^=$R_G$ and \SI{1}{M\ohm}] (in |-
+GND) node[ground]{};
+\draw (in) to[C, l_=$C_2$,*-o] ++(-1.5,0) node[left](vi1){$v_i=v_{i1}$};
+\draw (Q1.D) to[R, l2_=$R_D$ and \SI{10}{k\ohm}] ++(0,3) node[vcc](VCC){$V_{CC}=\SI
+{10}{V}$};
+\draw (Q1.D) to[short, -o] ++(1,0) node[right](vo1){$v_{o1}$};
+%
+\path (vo1) -- ++(2,0) coordinate(bjt);
+%
+\draw (bjt) node[npn, anchor=B, tr circle](Q2){Q2};
+\draw (Q2.B) to[short, -o] ++(-0.5,0) node[left](vi2){$v_{12}$};
+\draw (Q2.E) to[R,l2^=$R_E$ and \SI{9.3}{k\ohm}] (Q2.E |- VEE) node[vee]{};
+\draw (Q2.E) to[short, -o] ++(1,0) node[right](vo2){$v_{o2}$};
+\draw (Q2.C) to[short] (Q2.C |- VCC) node[vcc]{};
+%
+\path (vo2) ++(1.5,0) coordinate(load);
+\draw (load) to[C=$C_3$] ++(1,0) coordinate(tmp) to[R=$R_L$] (tmp |- GND) node[ground]{};
+
+\draw [densely dashed] (vo2) -- (load);
+%
+\draw [densely dashed] (vo1) -- (vi2);
+%
+\end{circuitikz}
+\caption{Двухкаскадный усилитель}
+\label{fig: amplifier}
+\end{figure}
+

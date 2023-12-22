@@ -1,0 +1,28 @@
+% arara: xelatex: { shell: true, interaction: nonstopmode } if changed('tex') || changed(toFile('fefudoc.cls'))
+%arara: biber if changed('bib') || changed('bcf') || changed('bbl')
+%arara: xelatex: { synctex: true, shell: true } if changed('aux')
+% !TeX document-id = {aeb1d315-a092-4f2c-9a2d-cfdcfa22bc21}
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = ru_RU
+% !TeX TXS-program:compile=txs:///xelatex/[--shell-escape]|txs:///view-pdf
+% !TeX TXS-program:bibliography = txs:///biber
+\documentclass[ {{thesis calendar plan}} ]{fefudoc}
+
+\Student{Андреев Борис Викторович}
+\Tutor{Борисов Виктор Геннадиевич}
+\Group{М3121-11.04.02срр}
+\Specialty{11.03.02}
+
+\begin{document}
+\begin{AssignmentPlan}
+\AssignmentPlanEntry{Анализ технического задания. Поиск и исследование литературы по теме выпускной квалификационной работы}{29.11.2021 -- 02.04.2022}{}
+\AssignmentPlanEntry{Составление плана работы}{11.04.2022--23.04.2022}{}
+\AssignmentPlanEntry{Разработка и согласование с руководителем основной части работы}{18.04.2022 -18.02.2023}{Работа выполнена не полно и с замечаниями}
+\AssignmentPlanEntry{Проведение эксперимента}{21.02.2023--27.05.2023}{}
+\AssignmentPlanEntry{Согласование с руководителем введения, выводов и предложений}{29.05.2023--24.06.2023}{}
+\AssignmentPlanEntry{Подготовка и публикация статей по тематике ВКР}{15.09.2022--24.06.2023}{}
+\AssignmentPlanEntry{Подготовка доклада и графического материала, ознакомление с рецензией}{24.06.2023--03.07.2023}{}
+\end{AssignmentPlan}
+\end{document}
+

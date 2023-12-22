@@ -1,0 +1,378 @@
+\chapter{Изучение источников по проблеме высокопроизводительных алгоритмов целочисленных преобразований сигналов, определенных над алгебраическими кольцами}
+\section{Виды используемых БПФ}
+Прямое вычисление $N$-точечного DFT требует $O(N^2)$ арифметических операций.
+Арифметическая операция подразумевает умножение и сложение.
+Однако эта сложность может быть значительно снижена за счет разработки эффективных алгоритмов \cite{FFTs, BrighamFFT}.
+Ключом к такому снижению вычислительной сложности является то, что в матрице DFT из $N^2$ элементов различны только $N$ элементов.
+Эти алгоритмы обозначаются как алгоритмы БПФ (быстрого преобразования Фурье) \cite{БПФ}.
+Существует несколько методов БПФ.
+
+Для начала будут рассмотрены алгоритмы БПФ с децимацией по времени (DIT) и децимацией по частоте (DIF).
+В представленном материале сначала рассматривается случай двоичных БПФ, а зетем это рассуждение обобщается и на иные случаи.
+\section{Алгоритм Radix-2 DIT-FFT}
+Этот алгоритм основан на разложении последовательности из $N$ точек (предположим, $N = 2^l$, $l\in\mathbb{Z}$) на две последовательности $N$ из 2 точек (одна из четных выборок, а другая из нечетных выборок) и получении DFT из N точек в терминах DFT этих двух последовательностей. Эта операция сама по себе приводит к некоторой экономии арифметических операций. Алгоритм схематично представлен на рисунках \ref{figure: one decimation} и \ref{figure: multi-decimation}.
+\begin{figure}[ht]
+\centering
+%\includegraphics{thesisexample-images/f1}
+\begin{tikzpicture}[x=7cm, y=-1cm, every node/.style={align=center}]
+\node (top) {$X_k^F =\{x_0, x_1, x_2, x_3, x_4, \dots{}, x_{N-2}, x_{N-1}\}$};
+\draw (top.south) -- ++(0, 0.5) coordinate(j) -| ++(-0.5, 0.5) node[anchor=north] (even) {Чётные отсчёты\\$G_k^F = \{x_0, x_2, x_4, \dots{}, x_{N-2}\}$};
+\draw (j) -| ++(0.5, 0.5) node[anchor=north] (odd) {Нечётные отсчёты\\$H_k^F = \{x_1, x_3, x_5, \dots{}, x_{N-1}\}$};
+\end{tikzpicture}
+\caption{Разложение последовательности из $N$ точек на две последовательности}
+\label{figure: one decimation}
+\end{figure}
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=\textwidth]{thesisexample-images/f2}
+\begin{tikzpicture}[x=4cm, y=-1cm, every node/.style={align=center}]
+\node (top) {$\{x_0, x_1, x_2, x_3, x_4, \dots{}, x_{N-2}, x_{N-1}\}$};
+\node[right=0.1cm of top, align=left] {Дискретизация: $T$\\Разрешение:$\frac{1}{N T} = f_0$};
+\draw (top.south) -- ++(0, 0.5) coordinate(jt) -| ++(-1, 1) node[anchor=north] (even) {Чётные отсчёты\\$\{x_0, x_2, x_4, \dots{}, x_{N-2}\}$};
+\draw (jt) -| ++(1.1, 1) node[anchor=north] (odd) {Нечётные отсчёты\\$\{x_1, x_3, x_5, \dots{}, x_{N-1}\}$};
+\draw (jt) ++(0, 1) node[anchor=north] (dft-2) {$N/2$-точечное\\ДПФ \\Дискретизация: $2 T$\\Разрешение:\\$\frac{1}{(N/2)(2T)} = f_0$};
+\draw (even.south) -- ++(0, 1.5) coordinate(je) -| ++(-0.5, 1) node[anchor=north] (parent) {$\{x_0, x_4, \dots{}, x_{N-4}\}$}
+      (je) -| ++(0.5, 1) node[anchor=north] {$\{x_2, x_6, \dots{}, x_{N-2}\}$}
+      (odd.south)  -- ++(0, 1.5) coordinate(jo) -| ++(-0.5, 1) node[anchor=north] {$\{x_1, x_5, \dots{}, x_{N-3}\}$}
+	  (jo) -| ++(0.5, 1) node[anchor=north] {$\{x_3, x_7, \dots{}, x_{N-1}\}$};
+\node[below=1cm of dft-2, align=left] {$N/4$-точечное ДПФ.\\Разрешение: $\frac{1}{(N/4)(4 T)} = f_0$.\\Дискретизация: $4 T$.};
+\draw [dashed] (parent.south) -- ++(0, 2) coordinate(dash start);
+\draw (dash start) -- ++(0, 0.5) coordinate(jlast) -| ++(-0.2, 0.5) node[anchor=north] {$x_0$}
+      (jlast) -| ++(0.2, 0.5) node[anchor=north] (x mid) {$x_{N/2}$};
+\node [right=0.1 of x mid] (two-point other) {\dots{}\dots{}\dots{}};
+\node [right=0.1 of two-point other, align=left] {2-х точечное ДПФ. Дискретизация: $\frac{N}{2} T$.\\Разрешение: $\frac{1}{2(N/2)T} = f_0$};
+\end{tikzpicture}
+\caption{Каждая из двух последовательностей разделяется ещё на две точечные последовательности до тех пока не будут получены только двухточечные последовательности}
+\label{figure: multi-decimation}
+\end{figure}
+
+Дополнительная экономия может быть достигнута путем разложения каждой из двух $N = 2$-точечных последовательностей на две $N = 4$-точечные последовательности (одна из четных выборок, а другая из нечетных выборок) и получения $N = 2$-точечных DFT в терминах, соответствующих два $N=4$-точечных ДПФ.
+Этот процесс повторяется до тех пор, пока не будут получены двухточечные последовательности.
+
+Подобно этому, существуют алгоритмы Radix-2 DIF, Radix-4 DIT, Radix-4 DIF.
+На рисунке \ref{figure: fft-butterfly} приведён граф разложения по частоте восьмиточечного ДПФ в двухточечные вычисления ДПФ.
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[x=1.5cm,y=-1cm, state/.style={shape=circle,fill=white,draw,inner sep=0.1cm}, decoration={markings, mark=at position 0.5 with {\arrow{Latex}}}, DFT/.style={shape=rectangle, draw, align=center}]
+\foreach \x in {0,1,2,3,4,5,6,7} {
+	\draw [postaction=decorate] (0, \x) node[state, anchor=east] (x \x) {} -- ++(1, 0) node[state, anchor=west] (fft N \x) {};
+	\draw [postaction=decorate] (fft N \x.east) -- ++(1, 0) node[state, anchor=west] (fft N rotate \x) {};
+	\draw[-Latex] (fft N rotate \x.east) -- ++(1, 0) node[state, anchor=west] (fft N/2 \x) {};
+	\node[left=0.1cm of x \x] {$x_\x$};
+}
+\foreach \x/\xx in {0/1, 2/3, 4/5, 6/7} {
+	\draw[postaction=decorate] (fft N/2 \x.east) -- ++(1, 0) coordinate(DFT \x in 1);
+	\draw (DFT \x in 1) +(0, 0.5) node[DFT, anchor=west] (DFT \x) {$\frac{N}{2}$-точечное\\ДПФ};
+	\path (DFT \x.east) +(0, -0.5) coordinate (DFT \x out 1);
+	\draw[postaction=decorate] (DFT \x out 1) -- +(1, 0) node[state] (f \x) {};
+	\node[right=0.1cm of f \x] {$X_\x^F$};
+
+	\draw[postaction=decorate] (fft N/2 \xx.east) -- ++(1, 0) coordinate (DFT \x in 2);
+	\path (DFT \x.east) +(0, 0.5) coordinate (DFT \x out 2);
+	\draw[postaction=decorate] (DFT \x out 2) -- +(1, 0) node[state] (f \xx) {};
+	\node[right=0.1cm of f \xx] {$X_\xx^F$};
+}
+\foreach \x/\xx/\xxx in {0/4/2, 1/5/3, 2/6/0, 3/7/1, 4/0/6, 5/1/7, 6/2/4, 7/3/5} {
+	\ifnum \x < \xx
+		\def\firstport{south east}\def\secondport{north east}
+	\else
+		\def\firstport{north east}\def\secondport{south east}
+	\fi
+	\draw[-Latex] (x \x.\firstport) -- (fft N \xx.\secondport);
+	\ifnum \x < \xxx
+		\def\firstport{south east}\def\secondport{north east}
+	\else
+		\def\firstport{north east}\def\secondport{south east}
+	\fi
+	\draw[-Latex] (fft N rotate \x.\firstport) -- (fft N/2 \xxx.\secondport);
+}
+\foreach \x in {4, 5, 6, 7} {
+	\edef\xx{\the\numexpr\x - 4\relax}
+	\coordinate (m \x) at ($(x \x)!0.5!(fft N \x)$);
+	\node [below=0.01 cm of m \x] {$-1$};
+	\coordinate (r \x) at ($(fft N \x)!0.5!(fft N rotate \x)$);
+	\node [below=0.01 cm of r \x] {$W_N^\xx$};
+}
+\foreach \x/\xx/\dft in {2/0/2, 3/2/2, 6/0/4, 7/2/4} {
+	\coordinate (mm \x) at ($(fft N rotate \x)!0.5!(fft N/2 \x)$);
+	\node[below=0.01cm of mm \x] {$-1$};
+	\coordinate (rr \x) at ($(fft N/2 \x)!0.5!(DFT \dft in \the\numexpr\xx/2+1\relax)$);
+	\node[below=0.01cm of rr \x] {$W_N^\xx$};
+}
+\node[above=0.1cm of x 0]{Данные};
+\node[above=0.1cm of f 0]{Частоты};
+\end{tikzpicture}
+\caption{Граф разложения по частоте восьмиточечного ДПФ в двухточечные вычисления ДПФ}
+\label{figure: fft-butterfly}
+\end{figure}
+
+\section{Быстрые алгоритмы с помощью разреженной матричной факторизации}
+Путем перестановки строк $[W_N^{nk}]$ в обратном порядке битов (BRO), он может быть учтен в $\log_2 N$ разреженных матриц, т.е. $[W_N^{nk} ]_BRO=[A_1][A_1] \dots [A_{\log_2 N}]$, где $N$ - целочисленная степень 2.
+Это проиллюстрировано для $N = 8$ на рисунке \ref{figure: fft-butterfly-sparse}.
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[x = 1.5cm, y = -1.5cm]
+\begin{scope}[
+	midarr/.style={
+		decoration={markings, mark=at position 0.5 with \arrow{Latex}},
+		postaction=decorate
+	},
+	quadarr/.style={
+		decoration={markings, mark=at position 0.25 with \arrow{Latex}},
+		postaction=decorate
+	},
+	octarr/.style={
+		decoration={markings, mark=at position 0.125 with \arrow{Latex}},
+		postaction=decorate
+	}
+]
+\foreach \inp/\f/\fdata/\ff/\ffdata/\out in {0/A/0/G/0/0, 4/A/1/G/1/1, 2/B/0/G/2/2, 6/B/1/G/3/3, 1/C/0/H/0/4, 5/C/1/H/1/5, 3/D/0/H/2/6, 7/D/1/H/3/7} {
+	\draw[midarr](0, \out) coordinate(inp-\out) -- ++(1, 0) coordinate(F1-\out-in);
+	\draw[midarr](F1-\out-in) -- node[align=center, above]{$\f_\fdata^F$} ++(0.5, 0) coordinate(F1-\out-out);
+	\draw[midarr](F1-\out-out) -- ++(1, 0) coordinate(F2-\out-in);
+	\draw[midarr](F2-\out-in) -- node[align=center, above]{$\ff_\ffdata^F$} ++(0.5, 0) coordinate (F2-\out-out);
+	\draw[midarr](F2-\out-out) -- ++(1, 0) coordinate(out-join-\out);
+	\draw[midarr](out-join-\out) -- ++(1, 0) coordinate(out-\out);
+	\node[right=0.1cm of out-\out] {$X_\out^F$};
+	\node[left=0.1cm of inp-\out] {$x_\inp$};
+}
+\foreach \out in {0, 2, 4, 6} {
+	\edef\other{\the\numexpr\out + 1}
+	\draw[quadarr] (inp-\out) -- (F1-\other-in);
+	\draw[quadarr] (inp-\other) -- (F1-\out-in);
+	\coordinate(c1-\other) at ($(inp-\other)!0.5!(F1-\other-in)$);
+	\node[below=0.05cm of c1-\other] {\footnotesize$-1$};
+}
+\foreach \out in {0, 1, 4, 5} {
+	\edef\other{\the\numexpr\out + 2}
+	\draw[octarr] (F1-\out-out) -- (F2-\other-in);
+	\draw[octarr] (F1-\other-out) -- (F2-\out-in);
+	\coordinate(c2-\other) at ($(F1-\other-out)!0.5!(F2-\other-in)$);
+	\node[below=0.15cm of c2-\other] {\footnotesize$-1$};
+}
+\foreach \out in {0, 1, 2, 3} {
+	\edef\other{\the\numexpr\out + 4}
+	\draw[-Latex] (F2-\out-out) -- (out-join-\other);
+	\draw[-Latex] (F2-\other-out) -- (out-join-\out);
+	\coordinate(c3-\other) at ($(F2-\other-out)!0.5!(out-join-\other)$);
+	\node[below=0.15cm of c3-\other] {\footnotesize$-1$};
+}
+\node[above=0.3cm of inp-0] {Вектор данных};
+\node[above=0.3cm of out-0] {Вектор спектра};
+\end{scope}
+\end{tikzpicture}
+\caption{Граф БПФ для $N=8$, где преобразование выполнено с помощью разреженной матричной факторизации}
+\label{figure: fft-butterfly-sparse}
+\end{figure}
+
+\section{БПФ для N составного числа}
+Когда $N$ является составным числом, можно разработать БПФ со мешанным основанием DIT, DIF и DIT/DIF. Пусть
+\begin{equation}\label{eq: N decomposition}
+N = p_1 p_2 \dots p_v = p_1 q_1, q_1 = p_2 p_3 \dots p_v = p_2 q_2, q_2 = p_3 p_4 \dots p_v.
+\end{equation}
+
+Процесс может быть описан для $N = 12$. Пример: $N = 12$; $p_1 = 3$; $q_1 = 4$:
+\begin{equation}\label{eq: N decomposition example}
+N = 12 = 3 \cdot 4 = 3 \cdot 2 \cdot 2.
+\end{equation}
+
+Разложение 12-точечной последовательности для DIT-FFT принимает вид, изображённый на рисунке \ref{figure: 12 point decomposition}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=0.9\textwidth]{thesisexample-images/f5}
+\begin{tikzpicture}[x=3.5cm, y=-1.5cm]
+\draw (0, 0) node[anchor=south] {$\{x_0, x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, x_{10}, x_{11}\}$} -- ++(0, 0.5) coordinate
+	(j) -| ++(-1, 0.5) node[anchor=north] (r3l) {$\{x_0, x_3, x_6, x_9\}$}
+	(j) -- ++( 0, 0.5) node[anchor=north] (r3m) {$\{x_1, x_4, x_7, x_{10}\}$}
+	(j) -| ++( 1, 0.5) node[anchor=north] (r3r) {$\{x_2, x_5, x_8, x_{11}\}$}
+	(r3l.south) -- ++(0, 0.5) coordinate
+		(jl) -| ++(-0.25, 0.5) node[anchor=north]{$\{x_0, x_6\}$}
+		(jl) -| ++( 0.25, 0.5) node[anchor=north] {$\{x_3, x_9\}$}
+	(r3m.south) -- ++(0, 0.5) coordinate
+		(jm) -| ++(-0.25, 0.5) node[anchor=north]{$\{x_1, x_7\}$}
+		(jm) -| ++( 0.25, 0.5) node[anchor=north]{$\{x_4, x_{10}\}$}
+	(r3r.south) -- ++(0, 0.5) coordinate
+		(jr) -| ++(-0.25, 0.5) node[anchor=north]{$\{x_2, x_8\}$}
+		(jr) -| ++( 0.25, 0.5) node[anchor=north] (r2r) {$\{x_5, x_{11}\}$};
+\node[right=0.1cm of r2r] (r2text) {radix-2};
+\node at (r3r -| r2text) {radix-3};
+\end{tikzpicture}
+\caption{Разложение 12-точечной последовательности}
+\label{figure: 12 point decomposition}
+\end{figure}
+
+\section{Split-Radix FFT Algorithm}
+Объединение radix-2 и radix-4 в результате даёт так называемый \textit{Split-Radix FFT} алгоритм, который имеет ряд преимуществ, включая наименьшее количество умножений/сложений между двумя алгоритмами. Алгоритм основан на наблюдении, что на каждом этапе значение radix-4 лучше для нечетных коэффициентов DFT, а значение radix-2 лучше для четных коэффициентов DFT.
+
+Схему алгоритма можно наблюдать на рисунке \ref{figure: split-radix}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=0.9\textwidth]{thesisexample-images/f6}
+\begin{tikzpicture}[x=1cm, y=-1cm]
+\foreach \x in {0, 1} {
+	\edef\xx{\the\numexpr\x * 7}
+	\foreach \y in {0, 1, 2, 3} {
+		\edef\yy{3.4 * \the\numexpr\y}
+		\node[align=center, shape=rectangle, draw, minimum height=3.2cm] (FFT \x\y) at (\xx, \yy) {Четырёх-\\точечный\\DIT FFT};
+		\foreach \p in {1, 2, 3, 4}{
+			\edef\pp{0.2*\the\numexpr\p}
+			\draw ($(FFT \x\y.north west)!\pp!(FFT \x\y.south west)$) -- +(-1, 0) coordinate (FFT \x\y-inp \p);
+			\draw ($(FFT \x\y.north east)!\pp!(FFT \x\y.south east)$) -- +( 1, 0) coordinate (FFT \x\y-out \p);
+		}
+	}
+}
+\foreach \y in {0, 1, 2, 3}
+	\foreach \yy in {0, 1, 2, 3}
+		\node [left=1cm of FFT 0\y-inp \the\numexpr\yy+1, anchor=west] {$x_{\the\numexpr\y + \the\numexpr\yy*4}$};
+\foreach \y/\d in {0/0, 1/2, 2/1, 3/3}
+	\foreach \yy/\dd in {1/0, 2/2, 3/1, 4/3} {
+		\node [right=0.1cm of FFT 1\y-out \yy, anchor=west] {$X_{\the\numexpr\d + \the\numexpr\dd*4}^F$};
+		\ifnum\d=0\def\dadj{4}\else\edef\dadj{\d}\fi
+		\node [below right=0.05cm of FFT 1\y-inp \yy, anchor=north] {\footnotesize{}$W_N^{\the\numexpr(\yy - 1) * \the\numexpr\dadj}$};
+	}
+\draw[-Latex] (FFT 00-out 1) -- (FFT 10-inp 1);
+\draw[-Latex] (FFT 00-out 2) -- (FFT 11-inp 1);
+\draw[-Latex] (FFT 00-out 3) -- (FFT 12-inp 1);
+\draw[-Latex] (FFT 00-out 4) -- (FFT 13-inp 1);
+\draw[-Latex] (FFT 01-out 1) -- (FFT 10-inp 2);
+\draw[-Latex] (FFT 02-out 1) -- (FFT 10-inp 3);
+\draw[-Latex] (FFT 03-out 1) -- (FFT 10-inp 4);
+\end{tikzpicture}
+\caption{Упрощённая схема Split-Radix-алгоритма}
+\label{figure: split-radix}
+\end{figure}
+
+Выше были приведены варианты представления стандартного алгоритма Кули-Туки.
+Их можно подробно рассмотреть в \cite{CT-FFT, NTT-using-cyclotomic-polynomials}.
+Был рассмотрен весь спектр быстрых radix-алгоритмов, в числе которых БПФ с радиусом 2, 3, 4, разделенным радиусом, DIT и DIF.
+Другие быстрые алгоритмы, такие как WFTA, БПФ с простым коэффициентом, UDFHT и т.д. были опущены.
+
+Общей целью этих алгоритмов является значительное снижение вычислительной сложности, ошибок округления/усечения и требований к памяти.
+Различные радиусы (radix 2, 3, 4 и т.д.) имеют определенные преимущества перед конкретными платформами, архитектурами и т.д., например, DSP LH9124 – 24-разрядный процессор с фиксированной точкой, который может обрабатывать данные со скоростью до 80 МГц реализован на radix-16 FFT.
+Дальнейшее увеличение эффективности БПФ было выполнено в алгоритме Шёнхаге — Штрассена \cite{Schonhage}.
+
+\section{Векторные radix-алгоритмы БПФ}
+Аналогично БПФ с радиусом 2, для многомерных сигналов может быть разработан векторно-радиусный двумерный БПФ.
+Как и в случае с БПФ radix-2, векторные алгоритмы radix могут быть разработаны как на основе DIT, так и на основе DIF.
+Также DIT и DIF могут быть смешаны в одном и том же алгоритме.
+На самом деле алгоритмы векторного радиуса существуют для любого радиуса.
+В качестве иллюстрации будет рассмотрен векторный радиальный БПФ для двумерного сигнала, основанный на DIT.
+Затем легко распространить этот метод на все другие алгоритмы векторного радиуса.
+Как и во всех быстрых алгоритмах, преимущества векторного радиального 2-D БПФ заключаются в снижении вычислительной сложности, снижении требований к памяти (хранилищу) и уменьшении ошибок из-за арифметики конечного размера бита.
+Векторные алгоритмы radix гораздо более удобны для векторных процессоров.
+
+2D-DFT (и его инверсия) определяется следующим образом:
+\begin{equation}\label{eq: 2d fft fwd}\begin{gathered}
+X^F(k_1, k_2) = \sum_{n_1=0}^{N_1-1} \sum_{n_2=0}^{N_2-1} x(n_1, n_2) W_{N_1}^{n_1 k_1} W_{N_2}^{n_2 k_2}, \\
+k_1 = 0, 1, \dots, N_1 - 1 \text{ и } k_2 = 0, 1, \dots, N_2 - 1.
+\end{gathered}\end{equation}
+\begin{equation}\label{eq: 2d fft inv}\begin{gathered}
+x(n_1, n_2) = \frac{1}{N_1 N_2} \sum_{k_1=0}^{N_1-1} \sum_{k_2=0}^{N_2-1} X^F(k_1, k_2) W_{N_1}^{-n_1 k_1} W_{N_2}^{-n_2 k_2}, \\
+n_1 = 0, 1, \dots, N_1 - 1 \text{ и } n_2 = 0, 1, \dots, N_2 - 1.
+\end{gathered}\end{equation}
+
+Символически векторный алгоритм radix-2 2-D DIT-FFT может быть представлен образом, представленным на рисунке \ref{figure: 2d vector fft}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=0.9\textwidth]{thesisexample-images/f7}
+\begin{tikzpicture}[x=3cm, y=-1cm]
+\draw (0, 0) node (root) {$(N_1 \times N_2)$-БПФ} +(2, 0) node {$N_1 = 2^{n_1}$, $N_2 = 2^{n_2}$}
+	(root.south) -- +(0, 0.5) coordinate (j1);
+\foreach \x/\m in {-2/1, -0.7/2, 0.7/3, 2/4}
+	\draw (j1) -| +(\x, 0.5) node[anchor=north] (B\m) {$\Big(\frac{N_1}{2}\times\frac{N_2}{2}\Big)$-БПФ};
+\draw (B2.south) -- +(0, 0.5) coordinate (j2);
+\foreach \x/\m in {-1.3/1, 0/2, 1.3/3, 2.6/4}
+	\draw (j2) -| +(\x, 0.5) node[anchor=north] (C\m) {$\Big(\frac{N_1}{4}\times\frac{N_2}{4}\Big)$-БПФ};
+\foreach \c/\e/\o in {1/e/e, 2/e/o, 3/o/e, 4/o/o}
+	\node [below=0.02cm of C\c.south] {$(\e, \o)$};
+\end{tikzpicture}
+\caption{Двумерный векторный алгоритм БПФ; здесь $e$ обозначает чётный отсчёт, а $o$ --- нечётный отсчёт}
+\label{figure: 2d vector fft}
+\end{figure}
+
+При условии равенства $N_1$ и $N_2$ \eqref{eq: 2d fft fwd} раскладывается следующим образом.
+\begin{equation*}\begin{aligned}
+X^F(k_1, k_2)
+ =& \sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1, 2 m_2) W_N^{2 m_1 k_1 + 2 m_2 k_2} \\
+ &+ \sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1 + 1, 2 m_2) W_N^{(2 m_1 + 1) k_1 + 2 m_2 k_2} \\
+ &+ \sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1, 2 m_2 + 1) W_N^{2 m_1 k_1 + (2 m_2 + 1) k_2} \\
+ &+ \sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1 + 1, 2 m_2 + 1) W_N^{(2 m_1 + 1) k_1 + (2 m_2 + 1) k_2},
+\end{aligned}\end{equation*}
+поэтому
+\begin{equation}\label{eq: binary fft decomposition}\begin{aligned}
+X^F(k_1, k_2)
+ =& \Big[\sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1, 2 m_2) W_{\frac{N}{2}}^{m_1 k_1 + m_2 k_2}\Big] \\
+ &+ W_N^{k_2}\Big[\sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1, 2 m_2 + 1) W_{\frac{N}{2}}^{m_1 k_1 + m_2 k_2}\Big] \\
+ &+ W_N^{k_1}\Big[\sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1 + 1, 2 m_2) W_{\frac{N}{2}}^{m_1 k_1 + m_2 k_2}\Big] \\
+ &+ W_N^{k_1+k_2}\Big[\sum_{m_1=0}^{\frac{N}{2}-1}\sum_{m_2=0}^{\frac{N}{2}-1} x(2 m_1 + 1, 2 m_2 + 1) W_{\frac{N}{2}}^{m_1 k_1 + m_2 k_2}\Big].
+\end{aligned}\end{equation}
+То есть
+\begin{equation}\label{eq:fft_recursion}\begin{aligned}
+X^F(k_1, k_2) =& S_{00}(k_1,k_2) + S_{01}(k_1, k_2) W_N^{k_2} \\
+              +& S_{10}(k_1, k_2) W_N^{k_1} + S_{11}(k_1, k_2) W_N^{k_1 + k_2},
+\end{aligned}\end{equation}
+причем для всех $i$ и $j$ из $\{0, 1\}$
+\begin{equation}\label{eq: fft_recursion_components}\begin{gathered}
+S_{i j}(k_1, k_2) = S_{i j}\Big(k_1 + \frac{N}{2}, k_2\Big) = S_{i j}\Big(k_1, k_2 + \frac{N}{2}\Big) \\
+= S_{i j}\Big(k_1 + \frac{N}{2}, k_2 + \frac{N}{2}\Big).
+\end{gathered}\end{equation}
+
+Поэтому, используя вышеописанные формулы, векторный алгоритм может быть представлен в матричной форме
+\begin{equation*}
+\begin{bmatrix}
+X^F(k_1, k_2) \\
+X^F(k_1, k_2 + \frac{N}{2}) \\
+X^F(k_1 + \frac{N}{2}, k_2) \\
+X^F(k_1 + \frac{N}{2}, k_2 + \frac{N}{2})
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 &  1 &  1 &  1 \\
+1 & -1 &  1 & -1 \\
+1 &  1 & -1 & -1 \\
+1 & -1 & -1 &  1
+\end{bmatrix}
+\begin{bmatrix}
+S_{00}(k_1, k_2) \\
+W_N^{k_2} S_{01}(k_1, k_2) \\
+W_N^{k_1} S_{10}(k_1, k_2) \\
+W_N^{k_1 + k_2} S_{11}(k_1, k_2)
+\end{bmatrix},
+\end{equation*}
+где $k_1, k_2 \in \mathbb{Z}_{\frac{N}{2}}$.
+
+Это матричное отношение может быть представлено в виде графа, представленного на рисунке \ref{fig: fft 2d butterfly}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=0.9\textwidth]{thesisexample-images/f9}
+\begin{tikzpicture}[x=2cm,y=-1cm,midarr/.style={postaction=decorate, decoration={markings, mark=at position 0.5 with \arrow{Latex}}},quadarr/.style={postaction=decorate, decoration={markings, mark=at position 0.25 with \arrow{Latex}}}]
+\foreach \y in {0, 1, 2, 3}
+	\foreach \x in {0, 1, 2, 3, 4}
+		\node[shape=circle, inner sep=0.1cm, draw] (n\x\y) at(\x, \y) {};
+\node[left=0.1cm of n00] {$S_{00}(k_1, k_2)$}; \node[right=0.1cm of n40] {$X^F(k_1, k_2)$};
+\node[left=0.1cm of n01] {$S_{01}(k_1, k_2)$}; \node[right=0.1cm of n41] {$X^F(k_1 + \frac{N}{2}, k_2)$};
+\node[left=0.1cm of n02] {$S_{10}(k_1, k_2)$}; \node[right=0.1cm of n42] {$X^F(k_1, k_2 + \frac{N}{2})$};
+\node[left=0.1cm of n03] {$S_{11}(k_1, k_2)$}; \node[right=0.1cm of n43] {$X^F(k_1 + \frac{N}{2}, k_2 + \frac{N}{2})$};
+\draw[midarr](n00.east) -- (n10.west); \draw[midarr](n10.east) -- (n20.west); \draw[midarr](n20.east) -- (n30.west); \draw(n30.east) -- (n40.west); \draw[quadarr](n10.south east) -- (n21.north west); \draw[midarr] (n20.south east) -- (n31.north west);
+\draw[midarr](n01.east) -- node[below=0.1cm,font=\footnotesize]{$W_N^{k_2}$} (n11.west); \draw[midarr](n11.east) -- node[below=0.1cm,font=\footnotesize]{$-1$} (n21.west); \draw (n31.east) -- (n41.west); \draw[quadarr] (n11.north east) -- (n20.south west); \draw[-Latex] (n21.south east) -- (n32.north west); \draw[-Latex] (n21.south east) -- (n33.north west);
+\draw[midarr](n02.east) -- node[below,font=\footnotesize]{$W_N^{k_1}$} (n12.west); \draw[midarr] (n12.east) -- (n22.west); \draw (n32.east) -- (n42.west); \draw[quadarr] (n12.south east) -- (n23.north west); \draw[midarr] (n22.north east) -- (n30.south west); \draw[-Latex] (n22.north east) -- node[at end, below, font=\footnotesize] {$-1$} (n31.south west);
+\draw[midarr](n03.east) -- node[below=0.1cm, font=\footnotesize] {$W_N^{k_1 + k_2}$} (n13.west); \draw[midarr](n13.east) -- node[below=0.1cm, font=\footnotesize] {$-1$} (n23.west); \draw[midarr](n23.east) -- node[below=0.1cm, font=\footnotesize] {$-1$} (n33.west); \draw(n33.east) -- (n43.west); \draw[quadarr] (n13.north east) -- (n22.south west); \draw[midarr](n23.north east) -- (n32.south west);
+\end{tikzpicture}
+\caption{Граф векторного алгоритма 2-D DIT-DFT для $N1 = N2 = 4$}
+\label{fig: fft 2d butterfly}
+\end{figure}
+Децимация выполняется $\log_2 N$ раз.
+Каждый шаг децимации включает в себя $N^2/4$ бабочек.
+Для каждой бабочки нужно три комплексных умножения и восемь комплексных сложений.
+\section{Алгоритм Шёнхаге-Штрассена}
+Алгоритм использует рекурсивные быстрые преобразования Фурье в кольцах с $2n + 1$ элементами.
+
+При данных входных числах $x$ и $y$ и целого $N$, алгоритм вычисляет произведение $xy \pmod{2^N + 1}$.
+При условии, что $N$ достаточно велико, это просто произведение.
+
+Каждое входное число разделяется на векторы $X$ и $Y$ по $2^k$ частей каждый, где $2^k$ делит $N$.
+
+Вычисляется произведение $X$ и $Y$ по модулю $2^N + 1$, используя негациклическую свертку.
+
+Затем выполняется перенос по модулю $2^N  + 1$, и получается финальный результат. Более подробный разбор алгоритма будет приведён в главе 2.
+

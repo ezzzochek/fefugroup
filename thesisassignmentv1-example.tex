@@ -1,0 +1,46 @@
+% arara: xelatex: { shell: true, interaction: nonstopmode } if changed('tex') || changed(toFile('fefudoc.cls'))
+%arara: biber if changed('bib') || changed('bcf') || changed('bbl')
+%arara: xelatex: { synctex: true, shell: true } if changed('aux')
+% !TeX document-id = {58fd3657-d034-4a85-a654-55196e148aff}
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = ru_RU
+% !TeX TXS-program:compile=txs:///xelatex/[--shell-escape]|txs:///view-pdf
+% !TeX TXS-program:bibliography = txs:///biber
+\documentclass[ {{barchelor thesis assignment v1}} ]{fefudoc}
+
+\Student{Андреев Борис Викторович}
+\Tutor{Борисов Виктор Геннадиевич}
+\Group{Б3118-11.03.02сррд}
+\Institute{Политехнический институт (Школа)}
+\Department{Департамент электроники, телекоммуникации и приборостроения}
+\EducationProgramHead{д-р. физ.-мат. наук, профессор}{Г.Д. Викторов}
+\DepartmentHead{д-р. физ.-мат. наук, профессор}{Д.Е. Геннадиев}
+\AssignmentDate{\today}
+\DefenseDate{17.06-21.06}
+
+\begin{document}
+\begin{Assignment}
+\AssignmentTheme{Анализ эффективности и разработка векторной формы алгоритма Шёнхаге-Штрассена умножения длинных целочисленных сигналов}
+\AssignmentReason{Приказ № 62-01-06-225 от 01.12.2021г.}
+\AssignmentSources{Техническое задание. Учебные пособия, статьи.}
+\AssignmentRequirements{Разработка векторной формы алгоритма теоретико-числового преобразования Фурье для осуществления сверточных операций.}
+\AssignmentExtraRequirements{Выполнение аналитической части, представление скалярной формы алгоритма, представление векторной формы алгоритма.}
+\AssignmentTopics{
+1. Изучение современной научно-технической литературы по вопросу.
+2. Проектирование алгоритмов дискретного и быстрого теоретико-числовых преобразований для быстрого решения задач расчета свертки в целых числах.
+3. Векторизация быстрого теоретико-числового преобразования и длинного умножения.
+}
+\AssignmentPosters{}
+\end{Assignment}
+
+\begin{AssignmentPlan}
+\AssignmentPlanEntry{Анализ технического задания. Поиск и исследование литературы по теме выпускной квалификационной работы}{04.10.2021 - 25.12.2021}{}
+\AssignmentPlanEntry{Составление плана работы}{27.12.2021-22.01.2022}{}
+\AssignmentPlanEntry{Разработка и согласование с руководителем основной части работы}{24.01.2023-11.06.2023}{Работа выполнена не полно и с замечаниями}
+\AssignmentPlanEntry{Согласование с руководителем введения, выводов и предложений}{13.06-16.06}{}
+\AssignmentPlanEntry{Подготовка доклада и графического материала}{17.06-21.06}{}
+\end{AssignmentPlan}
+
+\end{document}
+

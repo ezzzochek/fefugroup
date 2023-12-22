@@ -1,0 +1,314 @@
+\geometry{
+	paperwidth = 210mm,
+	paperheight = 297mm,
+	left = 3cm,
+	top = 2cm,
+	right = 1cm,
+	bottom = 2cm,
+	footskip = 1cm,
+	mag = 1000,
+	a4paper
+}
+\def\th@parindent{1.25cm}
+
+\IfFontExistsTF{Times New Roman}{%
+	\setmainfont{Times New Roman}%
+}{\IfFontExistsTF{LiberationSerif}{%
+	\setmainfont{LiberationSerif}%
+}{\IfFontExistsTF{Times}{%
+	\setmainfont{Times}%
+}}}
+
+\IfFontExistsTF{Courier}{%
+	\setmonofont{Courier}%
+}{\IfFontExistsTF{Liberation Mono}{%
+	\setmonofont{Liberation Mono}%
+}{\IfFontExistsTF{Consolas}{%
+	\setmonofont{Consolas}%
+}{\IfFontExistsTF{Hack}{%
+	\setmonofont{Hack}%
+}}}}
+
+\IfFontExistsTF{Arial}{%
+	\setsansfont{Arial}%
+}{\IfFontExistsTF{Liberation Sans}{%
+	\setsansfont{Liberation Sans}%
+}{\IfFontExistsTF{Helvetica}{%
+	\setsansfont{Helvetica}%
+}{\IfFontExistsTF{FreeSans}{%
+	\setsansfont{FreeSans}%
+}{\IfFontExistsTF{TeX Gyre Heros}{%
+	\setsansfont{TeX Gyre Heros}%
+}}}}}
+
+\let\ttfamily@old\ttfamily
+\newcommand{\ttfamily@set}[2]{\renewcommand{\ttfamily}{\ttfamily@old\fontsize{#1}{#2}\selectfont}}
+
+\def\tiny{\fontsize{7pt}{10.5pt}\selectfont\ttfamily@set{6pt}{10.5pt}}
+\def\scriptsize{\fontsize{8pt}{12pt}\selectfont\ttfamily@set{7pt}{12pt}}
+\def\footnotesize{\fontsize{9pt}{13.5pt}\selectfont\ttfamily@set{8pt}{13.5pt}}
+\def\small{\fontsize{12pt}{15pt}\selectfont\ttfamily@set{9pt}{15pt}}
+\def\normalsize{\fontsize{14pt}{21pt}\selectfont\ttfamily@set{12pt}{21pt}}
+\def\large{\fontsize{17.28pt}{25.92pt}\selectfont\ttfamily@set{17.28pt}{25.92pt}}
+
+\DeclarePrintbibliographyDefaults{title=Список использованных источников}
+
+\pagestyle{empty}
+\def\@parindent{\@z}
+
+\hbadness=10000
+
+\captionsetup[figure]
+{
+	name={Рисунок},
+	font={small},%
+	justification={centering},%
+	labelsep={endash},%
+	labelformat=simple,%
+	figurewithin=chapter
+}
+\captionsetup[table]
+{
+	name={Таблица},
+	font={normal},%
+	justification={justified},%
+	labelsep={endash},%
+	labelformat=simple,%
+	tablewithin=chapter,
+	singlelinecheck=false
+}
+
+\setlength{\intextsep}{2em}
+
+\AtBeginDocument{%
+%algorithm2e redefinition in case it is used
+\def\algocf@captiontext#1#2{Алгоритм \thealgocf{} -- \AlCapNameFnt{}#2}
+}
+
+%\counterwithout{equation}{section} % undo numbering system provided by phstyle.cls
+\counterwithin{equation}{chapter}  % implement desired numbering system
+
+\renewcommand\cfttoctitlefont{\normalfont}
+\renewcommand\cftchapfont{\normalfont}
+\renewcommand\cftchappagefont{\normalfont}
+\setlength\cftbeforetoctitleskip{-1em}
+\setlength\cftaftertoctitleskip{-1em}
+\renewcommand\cftparskip{\z@}
+\renewcommand{\cftchapleader}{\cftdotfill{0}}
+\renewcommand{\cftsecleader}{\cftdotfill{0}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{0}}
+\renewcommand{\cftsubsubsecleader}{\cftdotfill{0}}
+\renewcommand{\cftmarktoc}{}
+\setcounter{tocdepth}{1}
+\cftsetindents{chapter}{\z@}{\z@}
+\cftsetindents{section}{1.5em}{\z@}
+\cftsetindents{subsection}{3em}{\z@}
+\cftsetindents{subsubsection}{4.5em}{\z@}
+
+\AtBeginDocument{%
+	\renewcommand\contentsname{\begin{center}{\Large\bfseries{}СОДЕРЖАНИЕ}\end{center}}
+	\let\@toc\tableofcontents%
+	\renewcommand\tableofcontents{\clearpage\@toc}
+}
+
+\ExplSyntaxOn
+
+\cs_new_protected:Nn \remove_trailing_period:N {
+	\regex_replace_once:nnN {(.*)\.$} {\1} #1
+}
+
+\NewDocumentCommand{\removetrailingperiod}{m} {
+	\tl_set:Nn \l_tmpa_tl {#1}
+	\remove_trailing_period:N \l_tmpa_tl
+	\tl_use:N \l_tmpa_tl
+}
+
+\NewDocumentCommand{\thesis@addchapter}{m}{%
+	\clearpage
+	\par\parindent\z@%
+	\begin{center}
+	{\Large\bfseries#1}%
+	\end{center}
+	\par%
+	\nopagebreak%
+	\vspace*{2em}%
+	\setlength{\parindent}{\th@parindent}%
+}
+
+\NewDocumentCommand \thesis@chapter {sm} {
+	\tl_set:Nn \l_tmpa_tl {#2}
+	\remove_trailing_period:N \l_tmpa_tl
+	\str_if_eq:eeTF{\str_foldcase:V \l_tmpa_tl}{\str_foldcase:n{введение}}{\pagestyle{plain}}{}
+	\IfBooleanTF{#1}{
+		\tl_set:Nn \l_tmpb_tl {\text_uppercase:n{\tl_use:N \l_tmpa_tl}}
+	}{
+		\refstepcounter{chapter}
+		\tl_set:Nn \l_tmpb_tl {\thechapter\ \text_uppercase:n{\tl_use:N \l_tmpa_tl}}
+	}
+	\thesis@addchapter{\l_tmpb_tl}
+	\addcontentsline{toc}{chapter}{\l_tmpb_tl}
+}
+\NewDocumentCommand\thesis@appendix {sm} {
+	\tl_set:Nn \l_tmpa_tl {#2}
+	\remove_trailing_period:N \l_tmpa_tl
+	\IfBooleanTF{#1}{
+		\captionsetup*[figure]{figurewithin=none}
+		\captionsetup*[table]{tablewithin=none}
+		\setcounter{figure}{\z@}
+		\setcounter{table}{\z@}
+		\thesis@addchapter{Приложение\\\tl_use:N \l_tmpa_tl}
+		\addcontentsline{toc}{chapter}{Приложение.\ \tl_use:N \l_tmpa_tl}
+	}{
+		\refstepcounter{chapter}
+		\thesis@addchapter{Приложение\ \thechapter\\\tl_use:N \l_tmpa_tl}
+		\addcontentsline{toc}{chapter}{Приложение\ \thechapter.\ \tl_use:N \l_tmpa_tl}
+	}
+}
+
+\RenewDocumentCommand{\chapter}{}{\thesis@chapter}
+
+\NewDocumentCommand{\thesis@addsection}{m}{%
+	\vspace*{0.5em}%
+	%\par\parindent\z@%
+	\par\textbf{#1}\par%
+	\nopagebreak%
+	\vspace*{1em}%
+	%\setlength{\parindent}{\th@parindent}%
+}
+
+\NewDocumentCommand{\thesis@section}{sm}{
+	\tl_set:Nn \l_tmpa_tl {#2}
+	\remove_trailing_period:N \l_tmpa_tl
+	\IfBooleanTF{#1}{
+		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}%
+		\thesis@addsection{\tl_use:N \l_tmpa_tl}%
+	}{
+		\refstepcounter{section}%
+		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}%
+		\thesis@addsection{\hbox to 1cm{\protect{\thesection}}\tl_use:N \l_tmpa_tl}%
+	}
+}
+\RenewDocumentCommand{\section}{}{\thesis@section}
+
+\NewDocumentCommand{\thesis@addsubsection}{m}{%
+	\vspace*{0.5em}%
+	\par\parindent\z@%
+	\par\textbf{\textit{#1}}\par%
+	\nopagebreak%
+	\setlength{\parindent}{\th@parindent}%
+}
+
+\NewDocumentCommand{\thesis@subsection}{sm}{
+	\tl_set:Nn \l_tmpa_tl {#2}
+	\remove_trailing_period:N \l_tmpa_tl
+	\IfBooleanTF{#1}{
+		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
+		\thesis@addsubsection{\tl_use:N \l_tmpa_tl}%
+	}{
+		\refstepcounter{subsection}%
+		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}%
+		\thesis@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}%
+	}
+}
+
+\RenewDocumentCommand{\subsection}{}{\thesis@subsection}
+
+\ExplSyntaxOff
+
+\newcommand{\@addsubsubsection}[1]{%
+	\vspace*{0.5em}%
+	\par\parindent\z@%
+	\textbf{#1}%
+	\nopagebreak%
+	\setlength{\parindent}{\th@parindent}%
+}
+\newcommand{\@subsubsectionstar}[1]{%
+	\addcontentsline{toc}{subsubsection}{#1}%
+	\@addsubsubsection{#1}%
+}
+\newcommand{\@subsubsectionnostar}[1]{%
+	\refstepcounter{subsubsection}%
+	\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection} #1}%
+	\@addsubsubsection{\protect{\thesubsubsection}. #1}%
+}
+
+\renewcommand{\subsubsection}{\@ifstar{\@subsubsectionstar}{\@subsubsectionnostar}}
+
+\renewcommand\appendix{\par
+	\setcounter{chapter}{0}%
+	\setcounter{section}{0}%
+	\committotalcounters{}%
+	\renewcommand{\appendixname}{}
+	\gdef\thechapter{\@Alph\c@chapter}%
+	\renewcommand{\chapter}{\thesis@appendix}
+}
+\newcounter{itemlistctr}
+\newcommand{\makenumlabel}[1]{#1.\hfill}
+\newenvironment{itemlist}
+{
+	\begin{list}
+    {\arabic{itemlistctr}}
+    {\usecounter{itemlistctr}
+     \setlength{\labelwidth}{1cm}
+     \setlength{\labelsep}{0cm}
+     \setlength{\leftmargin}{\z@}
+     \setlength{\rightmargin}{\z@}
+     \setlength{\itemindent}{2cm}
+     \setlength{\itemsep}{\z@}
+     \setlength{\parsep}{\z@}
+     \setlength{\parskip}{\z@}
+     \setlength{\partopsep}{\z@}
+     \let\makelabel=\makenumlabel
+    }
+}
+{\end{list}}
+
+\newenvironment{whereblock}{где \begin{minipage}[t]{\textwidth-\widthof{где }}}{\strut\end{minipage}\strut}
+
+\DeclareNameAlias{author}{family-given}
+\DeclareFieldFormat{subtitle}{\emph{#1}}
+\DeclareBibliographyDriver{standard}
+{%
+	\printfield{title}%
+	\newunit
+	\printfield{subtitle}%
+	\newunit\newblock
+	\printfield{type}%
+	\newunit\newblock
+	\printlist{organization}%
+	\newunit
+	\printfield{month}, \printfield{year}%
+	\finentry
+}
+\DeclareSourcemap{
+	\maps[datatype=bibtex]{
+		\map[overwrite]
+		{
+			\pertype{manual}\pertype{standard}\pertype{techreport}\pertype{legislation}\pertype{jurisdiction}
+			\step[fieldsource=title, match=\regexp{[А-Я].*}, final]
+			\step[fieldset=presort, fieldvalue=1, append]
+		}
+		\map[overwrite]
+		{
+			\pertype{manual}\pertype{standard}\pertype{techreport}\pertype{legislation}\pertype{jurisdiction}
+			\step[fieldsource=title, final]
+			\step[fieldset=presort, fieldvalue=2, append]
+		}
+		\map[overwrite]
+		{
+			\step[fieldsource=author, match=\regexp{[А-Я].*}, final]
+			\step[fieldset=presort, fieldvalue=3, append]
+		}
+		\map[overwrite]
+		{
+			\step[fieldsource=author, final]
+			\step[fieldset=presort, fieldvalue=4, append]
+		}
+	}
+}
+\defbibenvironment{bibliography}{\begin{itemlist}}{\end{itemlist}}{\item}%
+
+%\AtBeginDocument{\renewcommand\contentsname{ОГЛАВЛЕНИЕ}}
+
+%\titleformat{\chapter}[display]{}{}{\z@}{}[]
+

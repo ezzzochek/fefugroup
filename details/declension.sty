@@ -1,0 +1,42 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{details/declension}[2022/08/26 V0.1 Андрей Чусов]
+
+\ExplSyntaxOn
+\cs_new_protected:Nn \@numerate_thing:nnnnn
+{
+	\regex_match_case:nnTF
+	{
+		{ ^[0-9]*?1[2-4]$ }{ \tl_set:Nn #1 {#5} } %рисунков
+		{ ^([0-9]*?[02-9])?1$ }{ \tl_set:Nn #1 {#3} } %рисунок
+		{ ^([0-9]*?[02-9])?[2-4]$ }{ \tl_set:Nn #1 {#4} } %рисунка
+		{ ^[0-9]+$ }{ \tl_set:Nn #1 {#5} } %рисунков
+	} {#2} {}{\tl_set:Nn #1 {\textbf{(??)}} \PackageWarning{details/declension}{Нечисловое~значение~#2}}
+}
+\cs_generate_variant:Nn \@numerate_thing:nnnnn {nxnnn}
+\NewDocumentCommand{\numeratepagecount}{ m }
+{
+	\@numerate_thing:nxnnn \l_tmpa_tl {#1}{страница}{страницы}{страниц}
+	\tl_use:N \l_tmpa_tl
+}
+\NewDocumentCommand{\numerateprintlists}{ m }
+{
+	\@numerate_thing:nxnnn \l_tmpa_tl {#1}{печатный\ лист}{печатных\ листа}{печатных\ листов}
+	\tl_use:N \l_tmpa_tl
+}
+\NewDocumentCommand{\numeratefigurecount}{ m }
+{
+	\@numerate_thing:nxnnn \l_tmpa_tl {#1}{рисунок}{рисунка}{рисунков}
+	\tl_use:N \l_tmpa_tl
+}
+\NewDocumentCommand{\numeratetablecount}{ m }
+{
+	\@numerate_thing:nxnnn \l_tmpa_tl {#1}{таблица}{таблицы}{таблиц}
+	\tl_use:N \l_tmpa_tl
+}
+\NewDocumentCommand{\numeratecitationcount}{ m }
+{
+	\@numerate_thing:nxnnn \l_tmpa_tl {#1}{источник}{источника}{источников}
+	\tl_use:N \l_tmpa_tl
+}
+\ExplSyntaxOff
+

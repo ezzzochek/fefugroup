@@ -1,0 +1,68 @@
+% arara: xelatex: { shell: true, interaction: nonstopmode } if changed('tex') || changed(toFile('fefudoc.cls'))
+%arara: biber if changed('bib') || changed('bcf') || changed('bbl')
+%arara: xelatex: { synctex: true, shell: true } if changed('aux')
+% !TeX document-id = {bee52599-d588-4a9f-9dfb-bb5e4a21d678}
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = ru_RU
+% !TeX TXS-program:compile=txs:///xelatex/[--shell-escape]|txs:///view-pdf
+% !TeX TXS-program:bibliography = txs:///biber
+\documentclass[ {{barchelor thesis}}, draught ]{fefudoc}
+\usepackage{enumitem} %нумерованные списки
+\usepackage{amsmath, amsfonts, amssymb, mathtools} %математика
+\usepackage{tikz} %рисование
+\usetikzlibrary{positioning, calc, arrows, decorations.markings}
+\usepackage[siunitx]{circuitikz} %рисование логических и принципиальных схем
+\usepackage{makecell} %доп. форматирование ячеек таблиц
+\renewcommand\theadfont{\normalsize\bfseries} %сделать заголовки таблиц из makecell
+\usepackage{biblatex} %список литературы
+\addbibresource{./главы примеров ВКР/список литературы.bib} %Файл со списком литературы.
+\usepackage{longtable, multirow} %длинные таблицы и многострочные ячейки
+\usepackage{pdflscape} %временное изменение ориентации страниц
+\usepackage{listings} %программный код
+\lstset{ %общие параметры расширения listings
+	basicstyle=\ttfamily\small, %выделять код программ специальным шрифтом малого размера
+	keywordstyle=\bfseries, %выделять ключевые слова языка жирным начертанием
+	commentstyle=\itshape, %выделять комментарии курсивом
+	columns=flexible, %сжимать при необходимости межсимвольный интервал для умещения на странице
+	frame=single, %обводить программный код одинарной рамкой
+	tabsize=2 %табуляция в программном коде эквивалентна двум пробелам
+}
+
+\Institute{Институт математики и компьютерных технологий (Школа)}
+\Department{Департамент программной инженерии и искусственного интеллекта}
+\specialty{09.03.04}
+\profile{Программная инженерия}
+\location{Владивосток}
+ 
+\author{Б9119-09.03.04прогин}{Андреев Борис Викторович}
+\tutor{кандидат технических наук}{}{доцент департамента ЭТиП}{Борисов Виктор Геннадиевич}
+%\reviewer{кандидат технических наук}{}{}{Викторов Геннадий Дмитриевич}
+%\normcontrol{}{}{}{Геннадиев Дмитрий Евгеньевич}
+\exportcontrol{}{}{}{Дмитриев Евгений Жаннович}
+\secretary{}{}{}{Евгениев Жан Захарович}
+\superintendent{доктор физико-математических наук}{профессор}{Заместитель директора по науке}{Жаннов Захар Ильич}
+
+\title{Разработка векторных алгоритмов и оценка точности сложения, умножения и Эвклидова деления беззнаковых длинных целых}
+\year=2023
+
+\begin{document}
+\frontpage
+\signaturepage
+%\includeassignmentpdf{thesisassignmentv2-example.pdf}
+%\includeplanpdf{thesiscalendarplan-example.pdf}
+\include{./главы примеров ВКР/аннотация}
+\include{./главы примеров ВКР/введение}
+\include{./главы примеров ВКР/1}
+\include{./главы примеров ВКР/2}
+\include{./главы примеров ВКР/3}
+\include{./главы примеров ВКР/4}
+\include{./главы примеров ВКР/заключение}
+\printbibliography
+\tableofcontents
+\appendix
+\include{./главы примеров ВКР/приложение с таблицей РПД}
+\include{./главы примеров ВКР/приложение с логической диаграммой и горизонтальной ориентацией}
+\include{./главы примеров ВКР/приложение с усилителем и без номера}
+\end{document}
+

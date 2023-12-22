@@ -1,0 +1,98 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{details/counttotal}[2022/08/26 V0.1 Андрей Чусов]
+\RequirePackage{details/declension}
+
+\providecommand\totpages{}
+\providecommand\totprintlists[2]{\textbf{(??)}}
+\newcounter{totfigures}
+\providecommand\totfig{}
+\newcounter{tottables}
+\providecommand\tottab{}
+\newcounter{totcitations}
+\providecommand\totcit{}
+
+\def\totalcounters@commited{}
+
+\newcommand{\committotalcounters}{%
+	\ifx\totalcounters@commited\@empty%
+		\gdef\totalcounters@commited{\relax}
+		\immediate\write\@mainaux{%
+			\string\gdef\string\totpages{\thepage}
+			\string\gdef\string\totprintlists{\string\@pagestolistcount}
+			\string\gdef\string\totfig{\number\value{totfigures}}
+			\string\gdef\string\tottab{\number\value{tottables}}
+			\string\gdef\string\totcit{\number\value{totcitations}}
+		}%
+		\renewcommand{\endfigure}{\counttotal@endfigureold}
+		\renewcommand{\endtable}{\counttotal@endtableold}
+		\renewcommand{\bibitem}{\counttotal@bibitem}
+	\fi
+}
+
+\newcount{\printlists@i}\relax
+\newcount{\printlists@f}\relax
+\newcommand{\@pagestolistcount}[2] {
+	\printlists@i=\totpages
+	\multiply\printlists@i by #1
+	\printlists@f=\printlists@i
+	\divide\printlists@i by #2
+	\multiply\printlists@f by 100
+	\divide\printlists@f by #2
+	\multiply\printlists@i by 100
+	\advance\printlists@f by -\printlists@i
+	\divide\printlists@i by 100
+	\the\printlists@i\ifnum\printlists@f=0\else,\ifnum\printlists@f<10 0\fi\the\printlists@f\fi
+}
+
+\IfFileExists{\jobname.pdf}%
+{%
+	\newcount{\ct@fs}\relax
+	\newcount{\ct@fsi}\relax
+	\newcount{\ct@fsf}\relax
+	\ct@fs=\filesize{\jobname.pdf}\relax
+	\ifnum\ct@fs < 1024
+		\def\ct@pdfsize@units{Б}
+		\def\ct@pdfsize{\ct@fs}
+	\else
+		\multiply\ct@fs by 10
+		\ifnum\ct@fs > 10485760\relax
+			\def\ct@pdfsize@units{МБ}
+			\divide\ct@fs by 1048576
+		\else
+			\def\ct@pdfsize@units{КБ}
+			\divide\ct@fs by 1024
+		\fi
+		\ct@fsi=\ct@fs
+		\ct@fsf=\ct@fs
+		\divide\ct@fsi by 10
+		\multiply\ct@fsi by 10
+		\advance\ct@fsf by -\ct@fsi
+		\divide\ct@fsi by 10
+		\def\ct@pdfsize{\ifnum\ct@fsf=0\the\ct@fsi\else\the\ct@fsi,\the\ct@fsf\fi}
+	\fi
+}{
+	\def\ct@pdfsize@units{MБ}
+	\def\ct@pdfsize{0}
+}
+%\edef\pdfsize{\ct@pdfsize}
+
+\AtBeginDocument{%
+	\@ifundefined{AtEveryBibitem}{}{\AtEveryBibitem{\stepcounter{totcitations}}}
+}
+\AtEndDocument{%
+	\committotalcounters{}
+}
+\let\counttotal@endfigureold\endfigure
+\renewcommand{\endfigure}{\stepcounter{totfigures}\counttotal@endfigureold}
+\let\counttotal@endtableold\endtable
+\renewcommand{\endtable}{\stepcounter{tottables}\counttotal@endtableold}
+\let\counttotal@bibitem\endtable
+\renewcommand{\bibitem}{\stepcounter{totcitations}\counttotal@bibitem}
+
+\newcommand{\totalpagecount}{\@ifstar{\totpages}{\totpages{} \numeratepagecount{\totpages}}}
+\newcommand{\totalfigurecount}{\@ifstar{\totfig}{\totfig{} \numeratefigurecount{\totfig}}}
+\newcommand{\totaltablecount}{\@ifstar{\tottab}{\tottab{} \numeratetablecount{\tottab}}}
+\newcommand{\totalcitationcount}{\@ifstar{\totcit}{\totcit{} \numeratecitationcount{\totcit}}}
+\newcommand{\totalprintlists@starred}[2]{\totprintlists{#1}{#2}} \newcommand{\totalprintlists@unstarred}[2]{\totprintlists{#1}{#2} \ifnum\printlists@f=0\numerateprintlists{\the\printlists@i}\else печатных листов\fi}
+\newcommand{\totalprintlists}{\@ifstar{\totalprintlists@starred}{\totalprintlists@unstarred}}
+\newcommand{\totalpdfsize}{\@ifstar{\pdfsize}{\ct@pdfsize\,\ct@pdfsize@units}}

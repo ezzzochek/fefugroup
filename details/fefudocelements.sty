@@ -1,0 +1,105 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{details/fefudocelements}[2022/08/26 V0.1 Андрей Чусов]
+
+\RequirePackage[rgb]{xcolor}
+\selectcolormodel{natural}
+\RequirePackage{ninecolors}
+\RequirePackage{tikz}
+\RequirePackage{tabularray, tabularx}
+
+\definecolor{fefublue}{RGB}{0,103,177}
+\definecolor{fefublue2}{RGB}{0,150,214}
+\usetikzlibrary{shadings, calc}
+\pgfdeclarehorizontalshading{fefudark}{50}
+{
+	color(0)=(fefublue);
+	color(40)=(fefublue);
+	color(50)=(fefublue2);
+	color(56)=(fefublue);
+	color(60)=(fefublue)
+}
+\pgfdeclareverticalshading{fefulight}{100}
+{
+	color(0)=(fefublue2!10!white);
+	color(30)=(fefublue2!10!white);
+	color(50)=(fefublue2);
+	color(100)=(fefublue2)
+}
+
+\newcommand{\fefulogobig}{%
+\begin{tikzpicture}[scale=0.5]
+
+\filldraw [color=black!0, shading=fefudark] (0, 0) .. controls (0.3, 3.5) .. (0.1, 5) arc [start angle=5, end angle=43.53, radius=7.2] .. controls (-4,12) and (-13.5, 16.6) .. (-14.8, 17.9) -- +(-3.5, -2) -- (-17.6, 14.5) .. controls (-16, 12.5) .. (-5.8, 6.2) arc [start angle=63, end angle=22, radius=12.25] -- (0, 0);
+
+\filldraw [color=white, shading=fefudark] (0, 10) .. controls +(0.3, 3.5) .. ++(0.3, 3.6) arc [start angle=0, end angle=51, radius=6.05] .. controls (-7.5, 22) .. (-13.4, 26.4) -- +(-2.5, -2.5) -- (-15.8, 23) .. controls +(2.6,-3.5) .. (-3, 13.4) arc [start angle=63, end angle=24, radius=6.05] -- (0, 10);
+
+\filldraw [color=black!0, shading=fefudark] (0, 19) .. controls +(0.15, 1) .. ++(0.2, 2) arc [start angle=0, end angle=57.34, radius=6.05] .. controls (-9.9, 31) .. (-13.5, 33.8) -- +(-1.5, -2) -- (-14.3, 30.32) .. controls (-13, 29) and (-7, 25) .. (-2, 21.5) arc [start angle=55, end angle=18, radius=5.2] -- (0, 19);
+
+\filldraw [color=fefublue2, shading=fefulight, shading angle=36, draw opacity=0] (-17.6, 14.6) .. controls +(-0.2, 2.2) and (-5, 24.55) .. (-3, 26.5) arc [start angle=-35.926, end angle=39, radius=2.625] .. controls +(126:1) .. (-4.3, 31.1) arc [start angle=22, end angle=-32.6, radius=1] .. controls (-17.2, 20.6) .. (-18, 19) arc [start angle=153, end angle=217.5, radius=4.22] -- (-17.6, 14.6);
+
+\filldraw [color=fefublue2, shading=fefulight, shading angle=36, draw opacity=0] (-15.77, 23) .. controls +(0.2, 2.2) and (-9, 28.9) .. (-6, 31.5) arc [start angle=-35.926, end angle=39, radius=1.9] .. controls +(126:0.5) .. (-7.05, 34.9) arc [start angle=22, end angle=-32.6, radius=1] .. controls (-14, 29.5) .. (-15.7, 28) arc [start angle=139.5, end angle=207.35, radius=3.73] -- (-15.77, 23);
+
+\filldraw [color=red, shading=fefulight, shading angle=36, draw opacity=0] (-14.265, 30.36) .. controls (-14, 31.5) and (-13, 32.25) .. (-8.85, 35) arc [radius=1.475, start angle=-60.5, end angle=41.5] ..controls +(-0.4, 0.45) .. (-9.3, 38) arc [radius=0.85, start angle=11.85, end angle=-51] .. controls (-10, 36.7) and (-13.3, 34.9) .. (-14.25, 34.2) arc [radius=2.8342, start angle=136.5, end angle=222.762] [draw opacity=0] -- (-14.265, 30.36);
+
+%\draw [step=1] (-19, 0) grid (1, 38);
+\end{tikzpicture}
+}
+\newcommand{\fefulogo}{%
+\begin{tikzpicture}
+
+\filldraw [color=black!0, shading=fefudark] (0mm, 0mm) .. controls (0.12mm, 1.4mm) .. (0.04mm, 2mm) arc [start angle=5, end angle=43.53, radius=2.88mm] .. controls (-1.6mm,4.8mm) and (-5.4mm, 6.64mm) .. (-6mm, 7.2mm) -- +(-1.30mm, -1.1mm) -- (-7.05mm, 5.71mm) .. controls (-6.4mm, 5mm) .. (-2.32mm, 2.48mm) arc [start angle=63, end angle=22, radius=4.9mm] -- (0mm, 0mm);
+
+\filldraw [color=white, shading=fefudark] (0mm, 4mm) .. controls +(0.12mm, 1.4mm) .. ++(0.12mm, 1.44mm) arc [start angle=0, end angle=51, radius=2.7mm] .. controls (-3mm, 8.8mm) .. (-5.36mm, 10.7mm) -- +(-1mm, -1mm) -- (-6.35mm, 9.2mm) .. controls +(1.04mm,-1.4mm) .. (-1.2mm, 5.36mm) arc [start angle=63, end angle=24, radius=2.42mm] -- (0mm, 4mm);
+
+\filldraw [color=black!0, shading=fefudark] (0mm, 7.6mm) .. controls +(0.06mm, 0.4mm) .. ++(0.08mm, 0.8mm) arc [start angle=0, end angle=57.34, radius=2.42mm] .. controls (-3.96mm, 12.4mm) .. (-5.4mm, 13.52mm) -- +(-0.6mm, -0.8mm) -- (-5.79mm, 12.11mm) .. controls (-5.2mm, 11.6mm) and (-2.8mm, 10mm) .. (-0.8mm, 8.6mm) arc [start angle=55, end angle=18, radius=2.08mm] -- (0mm, 7.6mm);
+
+\filldraw [color=fefublue2, shading=fefulight, shading angle=36, draw opacity=0] (-7.04mm, 5.84mm) .. controls +(-0.08mm, 0.88mm) and (-2mm, 9.82mm) .. (-1.2mm, 10.6mm) arc [start angle=-35.926, end angle=39, radius=1.05mm] .. controls +(126:0.4mm) .. (-1.72mm, 12.44mm) arc [start angle=22, end angle=-32.6, radius=0.4mm] .. controls (-6.88mm, 8.24mm) .. (-7.2mm, 7.6mm) arc [start angle=153, end angle=217.5, radius=1.688mm] -- (-7.04mm, 5.84mm);
+
+\filldraw [color=fefublue2, shading=fefulight, shading angle=36, draw opacity=0] (-6.285mm, 9.22mm) .. controls +(0.08mm, 0.88mm) and (-3.6mm, 11.56mm) .. (-2.4mm, 12.6mm) arc [start angle=-35.926, end angle=39, radius=0.76mm] .. controls +(126:0.2mm) .. (-2.82mm, 13.96mm) arc [start angle=22, end angle=-32.6, radius=0.4mm] .. controls (-5.6mm, 11.8mm) .. (-6.28mm, 11.2mm) arc [start angle=139.5, end angle=207.35, radius=1.492mm] -- (-6.285mm, 9.22mm);
+
+\filldraw [color=red, shading=fefulight, shading angle=36, draw opacity=0] (-5.706mm, 12.144mm) .. controls (-5.6mm, 12.6mm) and (-5.2mm, 12.9mm) .. (-3.54mm, 14mm) arc [radius=0.59mm, start angle=-60.5, end angle=41.5] ..controls +(-0.16mm, 0.18mm) .. (-3.72mm, 15.2mm) arc [radius=0.34mm, start angle=11.85, end angle=-51] .. controls (-4mm, 14.68mm) and (-5.32mm, 13.96mm) .. (-5.7mm, 13.68mm) arc [radius=1.13368mm, start angle=136.5, end angle=222.762] -- (-5.706mm, 12.144mm);
+
+%\draw [step=1mm] (-7.6mm, 0mm) grid (0.4mm, 15.2mm);
+\end{tikzpicture}
+}
+
+\RequirePackage{xstring}
+\RequirePackage{csquotes}
+\def\quot#1{«#1»}
+
+\def\@MinistryName{Министерство науки и высшего образования Российской Федерации}
+\def\@OrganisationType{Федеральное государственное автономное образовательное учреждение высшего образования}
+\def\@OrganisationName{Дальневосточный федеральный университет}
+\def\@OrganisationNameShort{ДВФУ}
+\def\@OrganisationNameTitle{\textbf{\quot{\@OrganisationName}} \\ (\@OrganisationNameShort)}
+\newcommand\Institute[1]{\def\@Institute{#1}}
+\newcommand\Department[1]{\def\@Department{#1}}
+
+\def\@topblock%
+{
+	\clearpage
+	\thispagestyle{empty}
+
+	\@HyphenationPenaltyOff
+	\begin{center}
+	\fefulogo \\
+	\fontsize{12pt}{13.1pt}\selectfont
+	\MakeUppercase{\@MinistryName} \\
+	\@OrganisationType \\
+	\fontsize{14pt}{16.1pt}\selectfont
+	\@OrganisationNameTitle \\
+	\fontsize{14pt}{2.1pt}\selectfont
+	\noindent\rule{\textwidth}{3pt}
+	\noindent\rule{\textwidth}{1pt}
+	\end{center}
+
+	\fontsize{14pt}{16.1pt}\selectfont
+
+	\begin{center}
+	\IfSubStr{\@Institute}{(Школа)}{%
+	\StrCut[-1]{\@Institute}{(Школа)}\csA\csB \textbf{\csA} \\ (Школа) \csB%
+	}{\textbf{\@Institute}} \\
+	\@Department
+	\end{center}
+}
+

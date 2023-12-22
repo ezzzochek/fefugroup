@@ -1,0 +1,47 @@
+% arara: xelatex: { shell: true, interaction: nonstopmode } if changed('tex') || changed(toFile('fefudoc.cls'))
+%arara: biber if changed('bib') || changed('bcf') || changed('bbl')
+%arara: xelatex: { synctex: true, shell: true } if changed('aux')
+% !TeX document-id = {0a346c97-4fec-4487-b840-d4acdead04bb}
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = ru_RU
+% !TeX TXS-program:compile=txs:///xelatex/[--shell-escape]|txs:///view-pdf
+% !TeX TXS-program:bibliography = txs:///biber
+\documentclass[ {{barchelor thesis assignment}} ]{fefudoc}
+\usepackage{url}
+
+\Student{Андреев Борис Викторович}
+\Tutor{Борисов Виктор Геннадиевич}
+\Group{Б3119-11.03.02сррд}
+\Specialty{11.03.02}
+\AssignmentDate{\today}
+%\AssignmentAcceptanceDate{24.06.2023}
+
+\begin{document}
+\begin{Assignment}
+\AssignmentTheme{Реализация и анализ табличных методов приближения цифровых сигналов}
+\AssignmentDueTime{}
+\AssignmentCoverage{1. Источники научно-технической литературы в базах данных реферируемых журналов. 2. В. М. Хачумов, Вычисление математических функций на основе разряднопараллельных схем, ИТиВС, 2016, выпуск 3, 26-44 3. Godbole B.B., Nikam R.H. FPGA implementation of CORDIC algorithm used in DDS based modulators. International Journal of Advanced Research in Computer and Communication Engineering, Vol.4, Issue 1, January 2015, pp.94-97.}
+%\AssignmentSources{Техническое задание. Учебные пособия, статьи.}
+\AssignmentTopics{
+1. Современные методы табличного приближения аналитических функций в машинных вычислениях.
+2. Использование арифметики с плавающей точкой для численного приближение и анализ ошибок аппроксимации, обусловленный арифметикой.
+3. Метод реализации приближения аналитических функций с помощью табличных предрасчетов.
+4. Разработка экспериментального образца и экспериментальное исследование точности приближения и оперативности.
+}
+\AssignmentPosters{
+1. Блок-схема реализации алгоритма приближения синусоидального и косинусоидального сигналов с помощью таблиц CORDIC.
+2. Оценка эффективности метода CORDIC для функций SIN и COS.
+3. Сравнение эффективности методов CORDIC и аппроксимации  при помощи рядов Тейлора.
+4. Оценка эффективности табличного метода аппроксимации функции LOG2(M) для 6000 битовой точности. 
+}
+\AssignmentConsultants{}
+\AssignmentSources{
+1. Rui Xu, Zhanpeng Jiang, Hai Huang, Changchun Dong. An Optimization of CORDIC Algorithm and FPGA Implementation. – International Journal of Hybrid Information Technology Vol.8, No.6 (2015), pp.217-228. – URL: \url{http://www.sersc.org/journals/IJHIT/vol8_no6_2015/21.pdf}.
+2. Muller, J. M., Elementary functions : algorithms and implementation / Jean-Michel Muller.– 2nd ed., 2005.
+3. Shrugal Varde, Dr. Nisha Sarwade, Richa Upadhyay. Hardware Implementation Of Hyperbolic Tan Using Cordic On FPGA International Journal of Engineering Research and Applications (IJERA), Vol.3, Issue 2, March-April 2013, pp.696-699.
+}
+\end{Assignment}
+
+\end{document}
+

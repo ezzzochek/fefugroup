@@ -1,0 +1,45 @@
+\begin{landscape}
+\chapter{Логическая диаграмма сумматора}
+\begin{figure}[ht]
+\centering
+\begin{circuitikz}[x=3cm, y=-0.7cm]\tikzset{every node/.style={rotate=-90}}\ctikzset{logic ports=ieee}
+\def\addbits#1{%
+coordinate(#1-x) -- +(0, 0.5) coordinate(#1-qj2) -- +(0, 1) node[xor port, anchor=in 2](#1-q){}
+      (#1-q.in 1) -- +(0, -1) coordinate(#1-y)
+      (#1-q.in 1) -- +(1, 0) node[xnor port, anchor=in 1](#1-n) {}
+	  -- +(2, 0) node[and port, anchor=in 1] (#1-m) {}
+	  (#1-qj2) -| (#1-n.in 2)
+	  (#1-qj2) -| (#1-m.in 2)
+      (#1-q.out) -- +(0, 0.5) coordinate(#1-uj1) -- +(0, 1) node[xor port, anchor=in 1] (#1-u) {}
+      +(0.5, 1) node[and port, anchor=in 2] (#1-s) {}
+	  (#1-u.in 2) coordinate(#1-zeta)
+	  (#1-u.out) coordinate(#1-out)
+      (#1-m.out) -- +(0, 0.3) coordinate(#1-rj1) -- +(0, 1) node[and port, anchor=in 1] (#1-r) {}
+      (#1-n.out) -- +(0, 0.7) -| (#1-r.in 2)
+      (#1-u.in 2) -- (#1-s.in 2) (#1-uj1) -| (#1-s.in 1)
+      (#1-s.out) -| +(0.5, 0.5) node[or port, anchor=in 2] (#1-t) {}
+      (#1-r.out) -| (#1-t.in 1)
+	  (#1-t.out) -| +(0.1, 0.5) node[or port, anchor=in 2] (#1-tt) {}
+	  (#1-rj1) -- +(0.15, 0) -- +(0.15, 3) -| (#1-tt.in 1)
+	  (#1-tt.out) coordinate(#1-carry)%
+}
+\draw (0, 0) \addbits{b0} (3, 0) \addbits{b1} (6, 0) \addbits{b2};
+\draw (b1-zeta) -- ++(0, -0.5) -- +(-0.5, 0) |- (b0-carry);
+\draw (b2-zeta) -- ++(0, -0.5) -- +(-0.5, 0) |- (b1-carry);
+\draw (b0-x) node[above, rotate=90] {$x_0$}
+      (b0-y) node[above, rotate=90] {$y_0$}
+      (b0-out) node[below, rotate=90] {$s_0$};
+\draw (b1-x) node[above, rotate=90] {$x_1$}
+      (b1-y) node[above, rotate=90] {$y_1$}
+      (b1-out) node[below, rotate=90] {$s_1$};
+\draw (b2-x) node[above, rotate=90] {$x_2$}
+      (b2-y) node[above, rotate=90] {$y_2$}
+      (b2-out) node[below, rotate=90] {$s_2$}
+	  (b2-carry) node[right, rotate=90] {\textit{перенос}};
+\end{circuitikz}
+\caption{Трехбитовый сумматор с битовым параллелизмом: $s_2 \cdot 2^2 + s_1 \cdot 2^1 + s_0 \cdot 2^0 = (x_2 \cdot 2^2 + x_1 \cdot 2^1 + x_0 \cdot 2^0) + (y_2 \cdot 2^2 + y_1 \cdot 2^1 + y_0 \cdot 2^0)$}
+\label{fig: 3-way summator}
+\end{figure}
+
+\end{landscape}
+

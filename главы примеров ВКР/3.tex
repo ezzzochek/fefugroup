@@ -1,0 +1,365 @@
+\chapter{Векторизация быстрого теоретико-числового преобразования и длинного умножения}\label{chapter: implementation}
+В данной главе рассмотрены методы и аспекты векторной реализации целочисленной арифметики.
+Рассмотрена структура векторного регистра, особенности реализации векторной арифметики \cite{IntelManual, ArmManual}.
+
+Предложен алгоритм векторного умножения чисел из множества $\mathbb{Z}_{2^{512}}$, представленных векторами из изоморфного множества $\mathbb{Z}_{2^{16}}^8$, которое реализуется векторным расширением AVX-512.
+
+\section{Основные аспекты векторизации вычислений}
+Векторизация вычислений заключается в принципе выполнения нескольких однотипных операций над множественным потоком данных.
+Этот принцип также называют SIMD –-- single instruction, multiple data.
+Использование векторных инструкций, как правило, положительно сказывается на производительности вычислений.
+
+Векторные вычисления реализуются как в специализированных процессорах, так и с помощью векторных расширений.
+В данной работе используется векторное расширение AVX-512, имеющее 32 векторных регистра длиной 512 бит, которые называются ZMM0\dots ZMM15.
+
+\section{Реализация умножения в $\mathbb{Z}_{2^{60}}$ средствами AVX-512}
+По заданию данный алгоритм необходимо ускорить путём векторного представления. Это выполнено с помощью набора векторных инструкций AVX-512 для процессоров Intel серии Core-X.
+
+Сначала входящие сигналы длиной 64 бита каждый разделяются на два 32-битовых символа, разделяясь на старший и младший символ, это изображено на блок-схеме на рисунке \ref{eq: vector operands example}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=0.7\textwidth]{thesisexample-images/f10}
+\begin{tikzpicture}[every node/.style={draw}, header/.style={draw=none}]
+\foreach \c\v/\V in {0/x/X, 6/y/Y} {
+	\node (\v h) at (\c,0) {$\v_{hi}$ (32 бит)};
+	\node[right=0 of \v h.east, anchor=west] (\v l) {$\v_{lo}$ (32 бит)};
+	\node[header, above=0.1cm of \v h.north east] {$\V$ (64 бит)};
+}
+\end{tikzpicture}
+\caption{Разложение входящих 64-битовых потоков данных на два 32-битовых разряда}
+\label{eq: vector operands example}
+\end{figure}
+
+Далее выполняется операция, графически представленная на рисунке \ref{eq: vector vertical operation example}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[height=6em]{thesisexample-images/f11}
+\begin{tikzpicture}[x=2cm, y=-1.5cm]
+\foreach \v/\y in {x/0, y/1} {
+	\node[draw] (\v hi) at (0, \y) {$\v_{hi}$ (32 бит)};
+	\node[draw, right=0cm of \v hi.east, anchor=west] (\v lo) {$\v_{lo}$ (32 бит)};
+}
+\foreach \p in {hi, lo} {
+	\draw (x\p.south) -- (y\p.north);
+	\node[fill=white, inner sep=0] at ($(x\p.south)!0.5!(y\p.north)$) {$\times$};
+	\path (y\p.south) +(0, 0.1) [draw, ->] -- +(0, 0.3) coordinate(out\p);
+	\node[below=-0.05 of out\p, anchor=north] {$p_{\p}$};
+}
+\end{tikzpicture}
+\caption{Умножение старших и младших символов изначально принятых значений}
+\label{eq: vector vertical operation example}
+\end{figure}
+
+Полученные значения сдвигаются в область ещё более старших и младших разрядов, проверяются на не превышение значения модуля и суммируются, образуя одно 64-битовое слово
+$$
+p = p_{hi} + p_{lo},
+$$
+которое, в свою очередь, проверяется на переполнение.
+Проверка выполняется путем сравнения суммы с одним из слагаемых, то есть переполнение возникает при $p_{hi}+p_{lo} < p_{hi}$  или $p_{hi}+p_{lo} < p_{lo}$.
+
+Программная реализация представлена на рисунке \ref{fig: avx512 32 bit multiplication}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=\textwidth]{thesisexample-images/f12}
+\begin{lstlisting}[language=C]
+__m512i p_hi = _mm512_mul_epu32(x_hi, y_hi);
+__m512i p_lo = _mm512_mul_epu32(x_lo, y_lo);
+__m512i p_hi_hi = _mm512_srli_epi64(p_hi, 32);
+__m512i p_hi_lo = _mm512_mask_mov_epi32(p_hi, lo_msk, p_hi);
+__m512i p;
+p_hi_hi = _mm512_mul_epu32(p_hi_hi, epi64_mod);
+p_hi_lo = _mm512_mul_epu32(p_hi_lo, epi64_mod);
+p_hi_lo = _mm512_add_epi64(p_hi_lo,
+       _mm512_slli_epi64(p_hi_hi, 32));
+p_hi_hi = _mm512_mul_epu32(_mm512_srli_epi64(p_hi_hi, 32),
+	epi64_mod);
+p_hi = _mm512_add_epi64(p_hi_lo, p_hi_hi);
+p = _mm512_add_epi64(p_hi, p_lo);
+p = _mm512_mask_sub_epi64(p,
+       _mm512_cmp_epu64_mask(p, p_hi, _MM_CMPINT_LT /*1*/), p, m);
+\end{lstlisting}
+\caption{Умножение старших и младших разрядов, сдвиг результатов в нужную область, их сумма и проверка на переполнение}
+\label{fig: avx512 32 bit multiplication}
+\end{figure}
+
+Заметим, что сложение можно реализовать путём выражения суммы в избыточной системе счисления.
+Это позволяет выполнять сложение без взаимосвязи между разрядами \cite{ChusovLychev}.
+
+Далее выполняется перекрёстное умножение разрядов --- старший на младший.
+Два полученных 32-битовых значения также суммируются (рис.~\ref{fig: vector cross-lane multiplication}) и проверяются на переполнение заданного максимального объёма в 64 бита.
+\begin{figure}[ht]
+\centering
+%\includegraphics[height=6em]{thesisexample-images/f13}
+\begin{tikzpicture}[x=2cm, y=-1.5cm]
+\foreach \v/\y in {x/0, y/1} {
+	\node[draw] (\v hi) at (0, \y) {$\v_{hi}$ (32 бит)};
+	\node[draw, right=0cm of \v hi.east, anchor=west] (\v lo) {$\v_{lo}$ (32 бит)};
+}
+\foreach \v/\p/\vl in {x/south/y, y/north/x} {
+	\foreach \vv/\ppb/\ppe in {hi/east/west,lo/west/east} {
+		\coordinate (\v\vv p) at ($(\v\vv.\p\space\ppb)!0.2!(\v\vv.\p\space\ppe)$);}
+}
+\foreach \v/\vl in {x/y, y/x}
+	\draw (\v hip) -- (\vl lop);
+\node[fill=white, inner sep=0.05] at($(xhip)!0.5!(ylop)$) {$\times$};
+\node[fill=white, draw, below=-0.2 of yhi.south east, anchor=north] (hadd) {$+$};
+\draw (yhi.south) +(0, 0.1) [->] |- (hadd.west);
+\draw (ylo.south) +(0, 0.1) [->] |- (hadd.east);
+\draw (hadd.south) +(0, 0.1) [->] -- +(0, 0.4) coordinate (output);
+\node[below=-0.05 of output, anchor=north] {$p_m$};
+\end{tikzpicture}
+\caption{Умножение старших и младших разрядов $p_m = x_{hi} y_{lo} + x_{lo} y_{hi}$}
+\label{fig: vector horizontal operation example}
+\end{figure}
+Результаты умножений вновь суммируются и проверяются на переполнение.
+Программная реализация представлена на рисунке \ref{fig: vector cross-lane multiplication}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=\textwidth]{thesisexample-images/f14}
+\begin{lstlisting}[language=C]
+__m512i p_m;
+x_hi = _mm512_mul_epu32(x_hi, y_lo);
+y_hi = _mm512_mul_epu32(y_hi, x_lo);
+p_m = _mm512_add_epi64(x_hi, y_hi);
+p_m = _mm512_mask_sub_epi64(p_m,
+         _mm512_cmp_epu64_mask(p_m, y_hi, _MM_CMPINT_LT /*1*/),
+         p_m, m);
+p_hi = _mm512_srli_epi64(p_m, 32);
+p_hi = _mm512_mul_epu32(p_hi, epi64_mod);
+p_lo = _mm512_slli_epi64(p_m, 32);
+p_m = _mm512_add_epi64(p_lo, p_hi);
+p_m = _mm512_mask_sub_epi64(p_m,
+         _mm512_cmp_epu64_mask(p_m, p_lo, _MM_CMPINT_LT /*1*/),
+         p, m);
+p = _mm512_add_epi64(p, p_m);
+p = _mm512_mask_sub_epi64(p,
+         _mm512_cmp_epu64_mask(p, p_m, _MM_CMPINT_LT /*1*/), p, m);
+p = _mm512_mask_sub_epi64(p,
+         _mm512_cmp_epu64_mask(p, m, _MM_CMPINT_NLT /*5*/), p, m);
+\end{lstlisting}
+\caption{Перекрёстное умножение старших и младших разрядов, сдвиг результатов в нужную область, их сумма и проверка на переполнение}
+\label{fig: vector cross-lane multiplication}
+\end{figure}
+
+\section{Реализация ДПФ с помощью AVX-512}
+Для выполнения ДПФ вошедшие данные представляются в виде матрицы, над которой выполняется быстрое преобразование Фурье и, следом, обратное преобразование Фурье.
+Их программное представление можно наблюдать на рисунке \ref{fig: avx512 nnt}.
+\begin{figure}[ht]
+\centering
+%\includegraphics[width=\textwidth]{thesisexample-images/f15}
+\begin{lstlisting}[language=C]
+static void my_mm512_fft_epi64x2(
+         __m512i time_lo, __m512i time_hi,
+	 __m512i* spec_lo, __m512i* spec_hi) {
+         my_mm512_fft_epi64x2_custom_matrix(
+                  time_lo, time_hi, spec_lo, spec_hi,
+                  fft_matrix.fwd_powers);
+}
+static void my_mm512_ifft_epi64x2(__m512i spec_lo, __m512i spec_hi,
+         __m512i* time_lo, __m512i* time_hi) {
+         __m512i h, l, r;
+         my_mm512_fft_epi64x2_custom_matrix(spec_lo, spec_hi, &l, &h,
+                  fft_matrix.bwd_powers);
+         r = _mm512_set1_epi64(reciprocal(UINT64_C(16), modulo));
+         *time_lo = my_mm512_mul_epi64_mod(l, r);
+         *time_hi = my_mm512_mul_epi64_mod(h, r);
+}
+void fnt_avx512_16(const unsigned long long* time,
+ unsigned long long* spectrum) {
+         __m512i hi, lo;
+         my_mm512_fft_epi64x2(
+                  _mm512_loadu_si512(time),
+                  _mm512_loadu_si512(&time[8]),
+                  &lo, &hi);
+         _mm512_storeu_si512(spectrum, lo);
+         _mm512_storeu_si512(&spectrum[8], hi);
+}
+void ifnt_avx512_16(const unsigned long long* spectrum,
+         unsigned long long* time) {
+         __m512i hi, lo;
+         my_mm512_ifft_epi64x2(
+                  _mm512_loadu_si512(spectrum),
+                  _mm512_loadu_si512(&spectrum[8]),
+                  &lo, &hi);
+         _mm512_storeu_si512(time, lo);
+         _mm512_storeu_si512(&time[8], hi);
+}
+\end{lstlisting}
+\caption{Прямое и обратное ДПФ с использованием инструкций AVX-512 для векторов и масок}
+\label{fig: avx512 nnt}
+\end{figure}
+
+Полученная матрица поворота умножается, в реализации \verb+my_mm512_fft_epi64x2_custom_matrix+, на вектор данных, обозначающих временную область сигнала в случае прямого преобразования Фурье и на вектор данных обозначающих спектр сигнала в случае обратного преобразования Фурье.
+При этом матрица 16x16 разделяется надвое, по восемь столбцов в каждой части.
+Все умножения выполняются по модулю.
+В случае прямого ДПФ:
+$$
+\begin{pmatrix}
+W_{LT} & W_{RT} \\
+W_{LB} & W_{RB}
+\end{pmatrix}
+\cdot
+\begin{pmatrix}
+T_L \\
+T_B
+\end{pmatrix},
+$$
+где $W$ –-- фрагмент матрицы поворота, $T$ –-- фрагмент значений временной области сигнала.
+
+В случае обратного ДПФ:
+$$
+\begin{pmatrix}
+W_{LT} & W_{RT} \\
+W_{LB} & W_{RB}
+\end{pmatrix}
+\cdot
+\begin{pmatrix}
+S_L \\
+S_B
+\end{pmatrix}.
+$$
+
+При этом, собираемые матрицы имеют вид:
+$$
+W_{LT} =
+\begin{bmatrix}
+W^0 &   W^0  &   W^0  &   W^0  &   W^0  &   W^0  &   W^0  &   W^0  \\
+W^0 &   W^1  &   W^2  &   W^3  &   W^4  &   W^5  &   W^6  &   W^7  \\
+W^0 &   W^2  &   W^4  &   W^6  &   W^8  & W^{10} & W^{12} & W^{14} \\
+W^0 &   W^3  &   W^6  &   W^9  & W^{12} & W^{15} &   W^2  &   W^5  \\
+W^0 &   W^4  &   W^8  & W^{12} &   W^0  &   W^4  &   W^8  & W^{12} \\
+W^0 &   W^5  & W^{10} & W^{15} &   W^4  &   W^9  & W^{14} &   W^3  \\
+W^0 &   W^6  & W^{12} &   W^2  &   W^8  & W^{14} &   W^4  & W^{10} \\
+W^0 &   W^7  & W^{14} &   W^5  & W^{12} &   W^3  & W^{10} &   W^1  \\
+\end{bmatrix},
+$$
+$$
+W_{LB} =
+\begin{bmatrix}
+W^0 &   W^8  &   W^0  &   W^8  &   W^0  &   W^8  &   W^0  &   W^8  \\
+W^0 &   W^9  &   W^2  & W^{11} &   W^4  & W^{13} &   W^6  & W^{15} \\
+W^0 & W^{10} &   W^4  & W^{14} &   W^8  &   W^2  & W^{12} &   W^6  \\
+W^0 & W^{11} &   W^6  &   W^1  & W^{12} &   W^7  &   W^2  & W^{13} \\
+W^0 & W^{12} &   W^8  &   W^4  &   W^0  & W^{12} &   W^8  &   W^4  \\
+W^0 & W^{13} & W^{10} &   W^7  &   W^4  &   W^1  & W^{14} & W^{11} \\
+W^0 & W^{14} & W^{12} & W^{10} &   W^8  &   W^6  &   W^4  &   W^2  \\
+W^0 & W^{15} & W^{14} & W^{13} & W^{12} & W^{11} & W^{10} &   W^9
+\end{bmatrix},
+$$
+$$
+W_{RT} =
+\begin{bmatrix}
+W^0 &   W^0  &   W^0  &   W^0  &   W^0  &   W^0  &   W^0  &   W^0  \\
+W^8 &   W^9  & W^{10} & W^{11} & W^{12} & W^{13} & W^{14} & W^{15} \\
+W^0 &   W^2  &   W^4  &   W^6  &   W^8  & W^{10} & W^{12} & W^{14} \\
+W^8 & W^{11} & W^{14} &   W^1  &   W^4  &   W^7  & W^{10} & W^{13} \\
+W^0 &   W^4  &   W^8  & W^{12} &   W^0  &   W^4  &   W^8  & W^{12} \\
+W^8 & W^{13} &   W^2  &   W^7  & W^{12} &   W^1  &   W^6  & W^{11} \\
+W^0 &   W^6  & W^{12} &   W^2  &   W^8  & W^{14} &   W^4  & W^{10} \\
+W^8 & W^{15} &   W^6  & W^{13} &   W^4  & W^{11} &   W^2  &   W^9
+\end{bmatrix},
+$$
+$$
+W_{RB} =
+\begin{bmatrix}
+W^0 &   W^8  &   W^0  &   W^8  &   W^0  &   W^8  &   W^0  &   W^8  \\
+W^8 &   W^1  & W^{10} &   W^3  & W^{12} &   W^5  & W^{14} &   W^7  \\
+W^0 & W^{10} &   W^4  & W^{14} &   W^8  &   W^2  & W^{12} &   W^6  \\
+W^8 &   W^3  & W^{14} &   W^9  &   W^4  & W^{15} & W^{10} &   W^5  \\
+W^0 & W^{12} &   W^8  &   W^4  &   W^0  & W^{12} &   W^8  &   W^4  \\
+W^8 &   W^5  &   W^2  & W^{15} & W^{12} &   W^9  &   W^6  &   W^3  \\
+W^0 & W^{14} & W^{12} & W^{10} &   W^8  &   W^6  &   W^4  &   W^2  \\
+W^8 &   W^7  &   W^6  &   W^5  &   W^4  &   W^3  &   W^2  &   W^1
+\end{bmatrix}.
+$$
+
+Результат прямого ДПФ отражает частотное представление входного сигнала, а результат обратного ДПФ --– его временн\'{о}е представление.
+Вышеописанные матрицы можно также собрать с помощью простого кода, представленного на рисунке \ref{fig: rotation matrix creation}.
+\begin{figure}[ht]
+%\includegraphics[width=\textwidth]{thesisexample-images/f16}
+\begin{lstlisting}[language={[11]C++}]
+struct fft_matrix {
+	std::uint64_t alignas(64) fwd_powers[256];
+	std::uint64_t alignas(64) bwd_powers[256];
+};
+constexpr fft_matrix_t construct_power_matrix() {
+	fft_matrix_t result = {{0}, {0}};
+	for (std::size_t c = 0; c < 16; ++c)
+		for (std::size_t r = 0; r < 16; ++c) {
+			result.fwd_powers[c * 16 + r] =
+				pow(primitive_root, (c * r) & 0xF, modulo);
+			result.bwd_powers[c * 16 + r] =
+				pow(primitive_root, (16 - (c * r) & 0xF) & 0xF, modulo);
+		}
+	return result;
+}
+constexpr fft_matrix_t fft_matrix = construct_power_matrix();
+\end{lstlisting}
+\caption{Создание матрицы поворота}
+\label{fig: rotation matrix creation}
+\end{figure}
+
+\section{Реализация длинного умножения с помощью AVX-512}
+Сначала устанавливаются индексы байтов, которые можно собрать из полученного 30-битового сигнала.
+Значения индексов отдельно друг от друга собираются в векторные регистры $xt$ и $yt$, над которыми далее выполняется быстрое преобразование Фурье.
+Программная реализация представлена на рисунке \ref{fig: vectorized ntt}.
+\begin{figure}[ht]
+%\includegraphics[width=\textwidth]{thesisexample-images/f17}
+\begin{lstlisting}[language=C]
+__m256i vindex = _mm256i_set_epi32(0, 3, 6, 9, 12, 15, 18, 21);
+__m512i xt, yt, xfl, xfh, yfl, yfh, ptl, pth, pfl, pfh;
+__m512i z = _mm512_setzero_si512();
+__m512i max_epi32 = _mm512_set1_epi64(0x00ffffffu);
+xt = _mm512_and_epi64(_mm512_i32gather_epi64(vindex, x, 1),
+         max_epi32);
+my_mm512_fft_epi64x2(xt, z, &xfl, &xfh);
+yt = _mm512_and_epi64(_mm512_i32gather_epi64(vindex, y, 1),
+         max_epi32);
+my_mm512_fft_epi64x2(yt, z, &yfl, &yfh);
+pfl = my_mm512_mul_epi64_mod(xfl, yfl);
+pfh = my_mm512_mul_epi64_mod(xfh, yfh);
+my_mm512_ifft_epi64x2(pfl, pfh, &ptl, &pth);
+\end{lstlisting}
+\caption{Реализация прямого и обратного преобразования Фурье над векторами}
+\label{fig: vectorized ntt}
+\end{figure}
+
+Над полученными значениями выполняется рекомбинация для занесения результатов умножений в память (рис. \ref{fig: 32 bit vectorized recombination}).
+\begin{figure}[ht]
+%\includegraphics[width=\textwidth]{thesisexample-images/f18}
+\begin{lstlisting}[language={[11]C++}]
+__m512i permute_ind = _mm512_set_epi64(6, 5, 4, 3, 2, 1, 0, 7);
+__m512i ones = _mm512_set1_epi64(~0ull);
+__mmask8 zl = _cvtu32_mask8(0xFEu);
+__m512i nmax_epi32 = _mm512_xor_epi64(max_epi32, ones);
+
+__m512i ptl_h = _mm512_srli_epi64(ptl, 24);
+ptl_h = _mm512_maskz_permutexvar_epi64(zl, permute_ind, ptl_h);
+ptl = _mm512_and_epi32(ptl, max_epi32);
+ptl = _mm512_mask_add_epi64(ptl, zl, ptl, ptl_h);
+__mmask8 c = _mm512_test_epi64_mask(ptl, nmax_epi32);
+__mmask8 i = _mm512_cmpeq_epi64_mask(ptl, ones);
+ptl = _mm512_mask_sub_epi64(ptl,
+	_kxor_mask8(_kadd_mask8(i, _kadd_mask8(c, c)), i), ptl, ones);
+__mmask8 zeta = _kshiftrt_mask8(c, 7);
+
+__m512i pth_h = _mm512_srli_epi64(pth, 24);
+pth_h = _mm512_maskz_permutexvar_epi64(zl, permute_ind, pth_h);
+pth = _mm512_and_epi32(pth, max_epi32);
+pth = _mm512_mask_sub_epi64(pth, _kxor_mask8(_kadd_mask8(i,
+	_kor_mask8(_kadd_mask8(c, c), zeta)), i), ptl, ones);
+
+alignas(64) unsigned char p[128];
+_mm512_i32scatter_epi64(p, vindex, ptl, 1);
+_mm512_i32scatter_epi64((char*) p + 24, vindex, ptl, 1);
+std::memcpy(product, p, 48);
+\end{lstlisting}
+\caption{Распределение результатов умножения по 32-битовым индексам и занесение результатов в память}
+\label{fig: 32 bit vectorized recombination}
+\end{figure}
+
+\section{Результаты проектирования алгоритма векторной реализации длинного целочисленного умножения беззнаковых целых}
+В главе рассмотрены аспекты векторной реализации теоретико-числового преобразования, основанного на алгоритме дискретного преобразования Фурье, определенного над целочисленным кольцом $\mathbb{Z}_{2^{64}}^8$ с вычисленным принципиальным корнем единицы в кольце $\mathbb{Z}_{2^{64}-94}$, множество элементов которого включено во множество $\mathbb{Z}_{2^{64}}$ скаляров, реализуемое большинством современных скалярных и векторных процессорных устройств, включая векторные устройства AVX-512.
+Используя реализуемые аппаратно арифметические операции (сложение, вычитание и умножение) кольца $\mathbb{Z}_{2^{64}}$, получена реализация операций кольца $\mathbb{Z}_{2^{64}-94}$.
+Кардинальность (и фактор) $2^{64}-94$ выбран методом перебора таким образом, чтобы удовлетворялись сформулированные в данной дипломной работе критерии.
+
