@@ -32,21 +32,23 @@
 
 \IfFontExistsTF{Times New Roman}{%
 	\setmainfont{Times New Roman}%
-}{\IfFontExistsTF{LiberationSerif}{%
-	\setmainfont{LiberationSerif}%
+}{\IfFontExistsTF{Liberation Serif}{%
+	\setmainfont{Liberation Serif}%
 }{\IfFontExistsTF{Times}{%
 	\setmainfont{Times}%
 }}}
 
-\IfFontExistsTF{Courier}{%
-	\setmonofont{Courier}%
-}{\IfFontExistsTF{Liberation Mono}{%
+\IfFontExistsTF{Liberation Mono}{%
 	\setmonofont{Liberation Mono}%
+}{\IfFontExistsTF{Courier New}{%
+	\setmonofont{Courier New}%
+}{\IfFontExistsTF{Courier}{%
+	\setmonofont{Courier}%
 }{\IfFontExistsTF{Consolas}{%
 	\setmonofont{Consolas}%
 }{\IfFontExistsTF{Hack}{%
 	\setmonofont{Hack}%
-}}}}
+}}}}}
 
 \IfFontExistsTF{Arial}{%
 	\setsansfont{Arial}%
