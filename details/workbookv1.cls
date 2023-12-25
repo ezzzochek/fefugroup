@@ -149,7 +149,7 @@
 \interfootnotelinepenalty=\@M
 
 \AtBeginDocument{%
-	\renewcommand\contentsname{\begin{center}{\bfseries{}ОГЛАВЛЕНИЕ}\end{center}}
+	\renewcommand\contentsname{\hspace{\fill}{\bfseries{}ОГЛАВЛЕНИЕ}\hspace*{\fill}\vspace{1em}\par\nopagebreak}
 	\let\@toc\tableofcontents%
 	\renewcommand\tableofcontents{\clearpage\@toc\thispagestyle{empty}\normalsize}
 }
@@ -628,11 +628,11 @@
 	\refstepcounter{wb@assignment}
 	\parindent\z@\ifvmode\else\par\fi\addvspace{1ex}
 	\bfseries\itshape
-	\begin{center}
+	\hspace{\fill}
 		Задача\ \thewb@assignment\relax\IfValueT{#1}{.\ #1.}
-	\end{center}
+	\hspace*{\fill}
 	\normalfont
-	\setlength{\parindent}{\wb@parindent}\par
+	\setlength{\parindent}{\wb@parindent}\par\nopagebreak
 }
 
 \ExplSyntaxOff
