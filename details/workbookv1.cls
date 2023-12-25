@@ -9,7 +9,6 @@
 %\renewcommand*{\bibfont}{\Large}
 \RequirePackage[paper=a4paper]{geometry}
 \RequirePackage{fontspec}
-%\RequirePackage{details/fefudocelements}
 \RequirePackage[tableposition=above, figureposition=below]{caption}
 \RequirePackage{fancyhdr}
 \RequirePackage{titlesec}
@@ -18,10 +17,7 @@
 \usetikzlibrary{calc}
 \RequirePackage{etoolbox}
 %\RequirePackage{floatrow}
-%\floatsetup[table]{font=small,capposition=top}
 \RequirePackage{details/counttotal}
-%\RequirePackage{zref-totpages}
-%\def\totalpagecount{\ztotpages}
 \RequirePackage[pdfencoding=auto, hidelinks]{hyperref}
 \RequirePackage[numbered, depth=3, openlevel=1]{bookmark}
 
@@ -117,14 +113,9 @@
 }
 
 \AtBeginDocument{%
-	%\let\old@tabular\tabular\def\tabular#1{\old@tabular{#1}\Large{}}
 	%algorithm2e redefinition in case it is used
 	\def\algocf@captiontext#1#2{Алгоритм \thealgocf{}. \AlCapNameFnt{}#2}
 }
-
-%\AtBeginEnvironment{tabular}{\small\def\ttsize{\footnotesize}}
-%\AtBeginEnvironment{tabularx}{\small\def\ttsize{\footnotesize}}
-%\AtBeginEnvironment{longtable}{\small\def\ttsize{\footnotesize}}
 
 %\counterwithout{equation}{section} % undo numbering system provided by phstyle.cls
 \counterwithin{equation}{chapter}  % implement desired numbering system
@@ -171,7 +162,6 @@
 }
 
 \NewDocumentCommand{\wb@addchapter}{m}{%
-	%\vspace*{0.5em}%
 	\clearpage
 	\parindent\z@\par
 	\hspace{\fill}{\bfseries#1}\hspace*{\fill}
@@ -264,10 +254,8 @@
 \RenewDocumentCommand{\subsection}{}{\wb@subsection}
 
 \NewDocumentCommand{\wb@addsubsubsection}{m}{%
-	%\par\parindent\z@%
 	\par\addvspace{0.5em}\textbf{#1}\ 
 	\nopagebreak%
-	%\setlength{\parindent}{\wb@parindent}%
 }
 
 \NewDocumentCommand{\wb@subsubsection}{sm}{%
@@ -366,7 +354,6 @@
 	\tl_normalize_affiliation:N \l_tmpa_tl
 	\seq_put_right:NV \seq_author_affiliation \l_tmpa_tl
 	\seq_put_right:Nn \seq_author_name {#4}
-	%\ClassWarning{DEBUG}{\tl_use:N \l_tmpa_tl}
 }
 \NewDocumentCommand{\theauthorname}{O{1}} {
 	\seq_item:Nn \seq_author_name {#1}
