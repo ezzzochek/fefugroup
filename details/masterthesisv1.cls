@@ -17,6 +17,8 @@
 \usetikzlibrary{calc}
 \RequirePackage{pdfpages}
 \RequirePackage{details/counttotal}
+\RequirePackage[pdfencoding=auto, hidelinks]{hyperref}
+\RequirePackage[numbered, depth=3, openlevel=1]{bookmark}
 
 \input{details/v1thesisstylesetup.def}
 

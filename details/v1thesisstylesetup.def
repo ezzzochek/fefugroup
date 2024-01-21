@@ -139,6 +139,7 @@
 
 \NewDocumentCommand \thesis@chapter {sm} {
 	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\str_if_eq:eeTF{\str_foldcase:V \l_tmpa_tl}{\str_foldcase:n{введение}}{\pagestyle{plain}}{}
 	\IfBooleanTF{#1}{
@@ -152,6 +153,7 @@
 }
 \NewDocumentCommand\thesis@appendix {sm} {
 	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF{#1}{
 		\captionsetup*[figure]{figurewithin=none}
@@ -161,9 +163,9 @@
 		\thesis@addchapter{Приложение\\\tl_use:N \l_tmpa_tl}
 		\addcontentsline{toc}{chapter}{Приложение.\ \tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{chapter}
-		\thesis@addchapter{Приложение\ \thechapter\\\tl_use:N \l_tmpa_tl}
-		\addcontentsline{toc}{chapter}{Приложение\ \thechapter.\ \tl_use:N \l_tmpa_tl}
+		\refstepcounter{appendix}
+		\thesis@addchapter{Приложение\ \@Alph\theappendix\\\tl_use:N \l_tmpa_tl}
+		\addcontentsline{toc}{chapter}{Приложение\ \@Alph\theappendix.\ \tl_use:N \l_tmpa_tl}
 	}
 }
 
@@ -180,6 +182,7 @@
 
 \NewDocumentCommand{\thesis@section}{sm}{
 	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF{#1}{
 		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}%
@@ -202,6 +205,7 @@
 
 \NewDocumentCommand{\thesis@subsection}{sm}{
 	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF{#1}{
 		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
@@ -215,33 +219,39 @@
 
 \RenewDocumentCommand{\subsection}{}{\thesis@subsection}
 
-\ExplSyntaxOff
-
-\newcommand{\@addsubsubsection}[1]{%
+\NewDocumentCommand{\thesis@addsubsubsection}{m}{
 	\vspace*{0.5em}%
 	\par\parindent\z@%
 	\textbf{#1}%
 	\nopagebreak%
 	\setlength{\parindent}{\th@parindent}%
 }
-\newcommand{\@subsubsectionstar}[1]{%
-	\addcontentsline{toc}{subsubsection}{#1}%
-	\@addsubsubsection{#1}%
-}
-\newcommand{\@subsubsectionnostar}[1]{%
-	\refstepcounter{subsubsection}%
-	\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection} #1}%
-	\@addsubsubsection{\protect{\thesubsubsection}. #1}%
+
+\NewDocumentCommand{\thesis@subsubsection}{sm}{
+	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\remove_trailing_period:N \l_tmpa_tl
+	\IfBooleanTF{#1}{
+		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}%
+		\thesis@addsubsubsection{#2}%
+	}{
+		\refstepcounter{subsubsection}%
+		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}%
+		\thesis@addsubsubsection{\protect{\thesubsubsection}.\ #2}%
+	}
 }
 
-\renewcommand{\subsubsection}{\@ifstar{\@subsubsectionstar}{\@subsubsectionnostar}}
+\RenewDocumentCommand{\subsubsection}{}{\thesis@subsubsection}
+
+\ExplSyntaxOff
 
 \renewcommand\appendix{\par
-	\setcounter{chapter}{0}%
-	\setcounter{section}{0}%
+	%\setcounter{chapter}{0}%
+	%\setcounter{section}{0}%
+	\newcounter{appendix}
 	\committotalcounters{}%
 	\renewcommand{\appendixname}{}
-	\gdef\thechapter{\@Alph\c@chapter}%
+	\gdef\thechapter{\@Alph\c@appendix}%
 	\renewcommand{\chapter}{\thesis@appendix}
 }
 \newcounter{itemlistctr}
