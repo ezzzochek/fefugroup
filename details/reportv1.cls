@@ -17,6 +17,8 @@
 \RequirePackage{tikz}
 \usetikzlibrary{calc}
 \RequirePackage{etoolbox}
+\RequirePackage[pdfencoding=auto, hidelinks]{hyperref}
+\RequirePackage[numbered, depth=3, openlevel=1]{bookmark}
 
 \geometry{
 	paperwidth = 210mm,
@@ -150,6 +152,7 @@
 
 \NewDocumentCommand{\report@section}{sm}{
 	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF{#1}{
 		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}%
@@ -173,6 +176,7 @@
 
 \NewDocumentCommand{\report@subsection}{sm}{
 	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF{#1}{
 		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
@@ -195,12 +199,15 @@
 }
 
 \NewDocumentCommand{\report@subsubsection}{sm}{
+	\tl_set:Nn \l_tmpa_tl {#2}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF {#1} {
-		\addcontentsline{toc}{subsubsection}{#2}%
+		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}%
 		\report@addsubsubsection{#2}%
 	}{
 		\refstepcounter{subsubsection}%
-		\addcontentsline{toc}{subsubsection}{\protect{\thesubsection}\ #2}%
+		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}%
 		\report@addsubsubsection{\protect{\thesubsubsection}.\ #2}%
 	}
 }
