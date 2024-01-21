@@ -164,7 +164,7 @@
 \NewDocumentCommand{\wb@addchapter}{m}{%
 	\clearpage
 	\parindent\z@\par
-	\hspace{\fill}{\bfseries#1}\hspace*{\fill}
+	{\centering\bfseries#1\par}
 	\vspace{1ex}%
 	\setlength{\parindent}{\wb@parindent}\par%
 	\nopagebreak%
@@ -205,12 +205,12 @@
 
 \RenewDocumentCommand{\chapter}{}{\wb@chapter}
 
-\NewDocumentCommand{\wb@addsection}{m}{%
-	\parindent\z@\ifvmode\else\par\fi\addvspace{1ex}%
-	\hspace{\fill}\textbf{#1}\hspace*{\fill}
-	\nopagebreak%
+\NewDocumentCommand{\wb@addsection}{m}{
+	\parindent\z@\ifvmode\else\par\fi\addvspace{1ex}
+	{\centering\bfseries#1\par}
+	\nopagebreak
 	\setlength{\parindent}{\wb@parindent}\par
-	\vspace{1ex}%
+	\vspace{1ex}
 }
 
 \NewDocumentCommand{\wb@section}{sm}{%
@@ -231,7 +231,7 @@
 
 \NewDocumentCommand{\wb@addsubsection}{m}{%
 	\parindent\z@\ifvmode\else\par\fi\addvspace{1ex}
-	\hspace{\fill}\textit{\textbf{#1}}\hspace*{\fill}
+	{\centering\bfseries\itshape#1\par}
 	\nopagebreak%
 	\setlength{\parindent}{\wb@parindent}\par
 	\vspace{1ex}
