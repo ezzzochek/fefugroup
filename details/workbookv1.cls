@@ -197,9 +197,9 @@
 		\wb@addchapter{Приложение\\\tl_use:N \l_tmpa_tl}
 		\addcontentsline{toc}{chapter}{Приложение.\ \tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{chapter}
-		\wb@addchapter{Приложение\ \protect{\thechapter}\\\tl_use:N \l_tmpa_tl}
-		\addcontentsline{toc}{chapter}{Приложение\ \protect{\thechapter}.\ \tl_use:N \l_tmpa_tl}
+		\refstepcounter{appendix}
+		\wb@addchapter{Приложение\ \protect{\@Alph\theappendix}\\\tl_use:N \l_tmpa_tl}
+		\addcontentsline{toc}{chapter}{Приложение\ \protect{\@Alph\theappendix}.\ \tl_use:N \l_tmpa_tl}
 	}
 }
 
@@ -274,11 +274,10 @@
 \RenewDocumentCommand{\subsubsection}{}{\wb@subsubsection}
 
 \RenewDocumentCommand{\appendix}{}{\par
-	\setcounter{chapter}{0}
-	\setcounter{section}{0}
-	\committotalcounters{}
+	\newcounter{appendix}
+	\committotalcounters{}%
 	\renewcommand{\appendixname}{}
-	\gdef\thechapter{\@Alph\c@chapter}%
+	\gdef\thechapter{\@Alph\c@appendix}%
 	\renewcommand{\chapter}{\wb@appendix}
 }
 \ExplSyntaxOff
