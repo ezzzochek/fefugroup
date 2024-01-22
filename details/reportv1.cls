@@ -177,6 +177,7 @@
 \NewDocumentCommand{\report@subsection}{sm}{
 	\tl_set:Nn \l_tmpa_tl {#2}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF{#1}{
 		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
@@ -184,7 +185,7 @@
 	}{
 		\refstepcounter{subsection}%
 		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}%
-		\report@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl.}%
+		\report@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpb_tl}%
 	}
 }
 
@@ -201,6 +202,7 @@
 \NewDocumentCommand{\report@subsubsection}{sm}{
 	\tl_set:Nn \l_tmpa_tl {#2}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF {#1} {
 		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}%
@@ -208,7 +210,7 @@
 	}{
 		\refstepcounter{subsubsection}%
 		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}%
-		\report@addsubsubsection{\protect{\thesubsubsection}.\ #2}%
+		\report@addsubsubsection{\protect{\thesubsubsection}.\ \tl_use:N \l_tmpb_tl}%
 	}
 }
 
