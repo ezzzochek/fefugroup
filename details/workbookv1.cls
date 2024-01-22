@@ -336,6 +336,7 @@
 	}
 }
 \defbibenvironment{bibliography}{\begin{itemlist}}{\end{itemlist}}{\item}%
+\renewbibmacro*{url}{\printfield[url]{urlraw}}
 
 \ExplSyntaxOn
 \NewDocumentCommand {\authors} {m} {

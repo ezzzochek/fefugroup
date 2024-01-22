@@ -264,6 +264,7 @@
 	}
 }
 \defbibenvironment{bibliography}{\begin{itemlist}}{\end{itemlist}}{\item}%
+\renewbibmacro*{url}{\printfield[url]{urlraw}}
 
 \def\@group{}
 \renewcommand\author[2]{\def\@author{#2}\def\@authorshort{\@fullnameinitialslastname{#2}}\def\@group{#1}}

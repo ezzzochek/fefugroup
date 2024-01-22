@@ -319,6 +319,7 @@
 	}
 }
 \defbibenvironment{bibliography}{\begin{itemlist}}{\end{itemlist}}{\item}%
+\renewbibmacro*{url}{\printfield[url]{urlraw}}
 
 %\AtBeginDocument{\renewcommand\contentsname{ОГЛАВЛЕНИЕ}}
 
