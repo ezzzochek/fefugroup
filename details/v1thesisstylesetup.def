@@ -373,8 +373,10 @@
 \defbibenvironment{bibliography}{\begin{itemlist}}{\end{itemlist}}{\item}%
 \renewbibmacro*{url}{\printfield[url]{urlraw}}
 
-%\AtBeginDocument{\renewcommand\contentsname{ОГЛАВЛЕНИЕ}}
+\AtBeginDocument{%
+	%\renewcommand\contentsname{ОГЛАВЛЕНИЕ}
+	\parskip\th@parskip
+	\parindent\th@parindent
+}
 
 %\titleformat{\chapter}[display]{}{}{\z@}{}[]
-
-\parskip=\th@parskip

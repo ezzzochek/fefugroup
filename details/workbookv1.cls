@@ -674,4 +674,7 @@
 \renewcommand{\totalprintlists}{\@ifstar{\totalprintlists@base*{250}{2159}}{\totalprintlists@base{250}{2159}}}
 \input{details/contractions.def}
 
-\parskip\wb@parskip
+\AtBeginDocument{%
+	\parskip\wb@parskip
+	\parindent\wb@parindent
+}

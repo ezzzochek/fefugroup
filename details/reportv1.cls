@@ -433,4 +433,7 @@
 
 \newcommand\frontpage{\@reportfrontpage}
 
-\parskip\rp@parskip
+\AtBeginDocument{
+	\parindent\rp@parindent
+	\parskip\rp@parskip
+}
