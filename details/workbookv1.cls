@@ -325,12 +325,24 @@
 	\maps[datatype=bibtex]{
 		\map[overwrite]
 		{
-			\step[fieldsource=author, match=\regexp{[А-Я].*}, final]
+			\step[fieldsource=author, match=\regexp{^[А-Яа-я].+}, final]
 			\step[fieldset=presort, fieldvalue=1, append]
 		}
 		\map[overwrite]
 		{
-			\step[fieldsource=author, final]
+			\step[notfield=author, final]
+			\step[fieldsource=title, match=\regexp{^[А-Яа-я].+}, final]
+			\step[fieldset=presort, fieldvalue=1, append]
+		}
+		\map[overwrite]
+		{
+			\step[fieldsource=author, match=\regexp{^[A-Za-z].+}, final]
+			\step[fieldset=presort, fieldvalue=2, append]
+		}
+		\map[overwrite]
+		{
+			\step[notfield=author, final]
+			\step[fieldsource=title, match=\regexp{^[A-Za-z].+}, final]
 			\step[fieldset=presort, fieldvalue=2, append]
 		}
 	}

@@ -297,23 +297,39 @@
 		\map[overwrite]
 		{
 			\pertype{manual}\pertype{standard}\pertype{techreport}\pertype{legislation}\pertype{jurisdiction}
-			\step[fieldsource=title, match=\regexp{[А-Я].*}, final]
+			\step[fieldsource=title, match=\regexp{^[А-Яа-я].*}, final]
 			\step[fieldset=presort, fieldvalue=1, append]
 		}
 		\map[overwrite]
 		{
 			\pertype{manual}\pertype{standard}\pertype{techreport}\pertype{legislation}\pertype{jurisdiction}
-			\step[fieldsource=title, final]
+			\step[fieldsource=title, match=\regexp{^[^А-Яа-я].*}, final]
 			\step[fieldset=presort, fieldvalue=2, append]
 		}
 		\map[overwrite]
 		{
-			\step[fieldsource=author, match=\regexp{[А-Я].*}, final]
+			\pernottype{manual}\pernottype{standard}\pernottype{techreport}\pernottype{legislation}\pernottype{jurisdiction}
+			\step[fieldsource=author, match=\regexp{^[А-Яа-я].*}, final]
 			\step[fieldset=presort, fieldvalue=3, append]
 		}
 		\map[overwrite]
 		{
-			\step[fieldsource=author, final]
+			\pernottype{manual}\pernottype{standard}\pernottype{techreport}\pernottype{legislation}\pernottype{jurisdiction}
+			\step[notfield=author, final]
+			\step[fieldsource=title, match=\regexp{^[А-Яа-я].*}, final]
+			\step[fieldset=presort, fieldvalue=3, append]
+		}
+		\map[overwrite]
+		{
+			\pernottype{manual}\pernottype{standard}\pernottype{techreport}\pernottype{legislation}\pernottype{jurisdiction}
+			\step[fieldsource=author, match=\regexp{^[^А-Яа-я].*}, final]
+			\step[fieldset=presort, fieldvalue=4, append]
+		}
+		\map[overwrite]
+		{
+			\pernottype{manual}\pernottype{standard}\pernottype{techreport}\pernottype{legislation}\pernottype{jurisdiction}
+			\step[notfield=author, final]
+			\step[fieldsource=title, match=\regexp{^[^А-Яа-я].*}, final]
 			\step[fieldset=presort, fieldvalue=4, append]
 		}
 	}
