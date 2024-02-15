@@ -64,6 +64,10 @@
 	\setsansfont{TeX Gyre Heros}%
 }}}}}
 
+\newdimen\rp@parindent\rp@parindent1cm
+\newskip\rp@parskip\rp@parskip\z@ plus1em minus 0.1em
+\newcount\rp@secsecvpenalty\rp@secsecvpenalty\@highpenalty
+
 \pagestyle{plain}
 \fancyhf{}
 \fancyfoot[R]{\thepage}
@@ -72,8 +76,6 @@
     \fancyhf{}%
     \fancyfoot[R]{\thepage}%
 }
-
-\def\@parindent{\@z}
 
 \hbadness=10000
 
@@ -140,79 +142,99 @@
 	\tl_use:N \l_tmpa_tl
 }
 
-\newcommand{\report@addsection}[1]{
-	\ifhmode\par\fi\addvspace{2ex}\parindent\z@
+\newif\if@rp@aftersection\@rp@aftersectionfalse
+
+\def\rp@addsection#1{
 	\textbf{#1}
+	\parindent\rp@parindent
 	\par\nobreak\@afterheading
-	\vspace{1ex}
-	\setlength{\parindent}{1cm}
 }
 
-\NewDocumentCommand{\report@section}{sm}{
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\rp@section}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+
+	\ifhmode\par\fi
+	\addvspace{2ex plus 1ex minus 1ex}
+	\if@rp@aftersection\penalty\rp@secsecvpenalty\fi
+	\parindent\z@
 	\IfBooleanTF{#1}{
-		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}%
-		\report@addsection{\tl_use:N \l_tmpa_tl}%
+		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}
+		\rp@addsection{\tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{section}%
-		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}%
-		\report@addsection{\hbox to 1cm{\protect{\thesection}}\tl_use:N \l_tmpa_tl}%
+		\refstepcounter{section}
+		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}
+		\rp@addsection{\hbox to 1cm{\protect{\thesection}}\tl_use:N \l_tmpa_tl}
 	}
+	\IfValueT{#2}{\label{#2}}
+	\@rp@aftersectiontrue\everypar{\@rp@aftersectionfalse\everypar{}}
+	\vskip1ex plus 0.5ex minus 0.5ex
 }
 
-\RenewDocumentCommand{\section}{}{\report@section}
+\RenewDocumentCommand{\section}{}{\rp@section}
 
-\NewDocumentCommand{\report@addsubsection}{m}{
-	\ifhmode\par\fi\addvspace{1ex}\parindent\z@
+\def\rp@addsubsection#1{
 	\textbf{#1}
+	\parindent\rp@parindent
 	\par\nobreak\@afterheading
-	\addvspace{1ex}
-	\setlength{\parindent}{1cm}
 }
 
-\NewDocumentCommand{\report@subsection}{sm}{
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\rp@subsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+
+	\ifhmode\par\fi
+	\addvspace{1ex plus 0.5ex minus 0.5ex}
+	\if@rp@aftersection\penalty\rp@secsecvpenalty\fi
+	\parindent\z@
 	\IfBooleanTF{#1}{
-		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
-		\report@addsubsection{\tl_use:N \l_tmpa_tl}%
+		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}
+		\rp@addsubsection{\tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{subsection}%
-		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}%
-		\report@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}%
+		\refstepcounter{subsection}
+		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}
+		\rp@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}
 	}
+	\IfValueT{#2}{\label{#2}}
+	\@rp@aftersectiontrue\everypar{\@rp@aftersectionfalse\everypar{}}
+	\vskip1ex plus 0.5ex minus 0.5ex
 }
 
-\RenewDocumentCommand{\subsection}{}{\report@subsection}
+\RenewDocumentCommand{\subsection}{}{\rp@subsection}
 
-\NewDocumentCommand{\report@addsubsubsection}{m}{
-	\vspace*{0.5em}
-	\par\parindent\z@
-	\textbf{\textit{#1}\ }
-	\nopagebreak
-	\setlength{\parindent}{1cm}
+\def\rp@addsubsubsection#1{
+	\textbf{\textit{#1}}
+	\parindent\rp@parindent
+	\vadjust{\nobreak\@afterheading}
 }
 
-\NewDocumentCommand{\report@subsubsection}{sm}{
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\rp@subsubsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\regex_replace_once:nnN {\ +$}{} \l_tmpa_tl
 	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+
+	\ifhmode\par\fi
+	\addvspace{0.5em plus 0.4em minus 0.4em}
+	\if@rp@aftersection\penalty\rp@secsecvpenalty\fi
+	\parindent\z@
 	\IfBooleanTF {#1} {
-		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}%
-		\report@addsubsubsection{#2}%
+		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}
+		\rp@addsubsubsection{\tl_use:N \l_tmpb_tl}
 	}{
-		\refstepcounter{subsubsection}%
-		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}%
-		\report@addsubsubsection{\protect{\thesubsubsection}.\ \tl_use:N \l_tmpb_tl}%
+		\refstepcounter{subsubsection}
+		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}
+		\rp@addsubsubsection{\protect{\thesubsubsection}.\ \tl_use:N \l_tmpb_tl}
 	}
+	\@rp@aftersectiontrue\everypar{\@rp@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
 }
 
-\RenewDocumentCommand{\subsubsection}{}{\report@subsubsection}
+\RenewDocumentCommand{\subsubsection}{}{\rp@subsubsection}
 \ExplSyntaxOff
 
 \let\ttfamily@old\ttfamily
@@ -239,7 +261,7 @@
      \setlength{\itemindent}{2cm}%
      \setlength{\itemsep}{\z@}%
      \setlength{\parsep}{\z@}%
-     \setlength{\parskip}{\z@}%
+     \setlength{\parskip}{\rp@parskip}%
      \setlength{\partopsep}{\z@}%
      \let\makelabel=\makenumlabel%
     }%
@@ -369,7 +391,7 @@
 	\setlength{\skip1}{\widthof{Проверил \@makeshorttitles{\@teacherdegree}{\@teacherrank}{\@teacheremployment}}}\ifdim\the\skip1>\the\skip0\relax\setlength{\skip0}{\the\skip1}\fi
 	\setlength{\skip1}{\widthof{\@teachershort} + 3cm}\ifdim\the\skip1>\the\skip0\relax\setlength{\skip0}{\the\skip1}\fi
 	\hfill\begin{minipage}{\the\skip0}
-	\setlength{\parindent}{0pt}%
+	\setlength{\parindent}{\z@}%
 	\setlength{\baselineskip}{20.1pt}%
 	\hfill Выполнил студент гр. \@group \\
 	\setlength{\skip1}{\the\skip0 - \widthof{ \@authorshort}}\tikz[overlay] \draw(0, -1pt) -- +(\the\skip1, 0);\hspace{\the\skip1} \@authorshort
@@ -398,5 +420,4 @@
 
 \newcommand\frontpage{\@reportfrontpage}
 
-\AtBeginDocument{}
-
+\parskip\rp@parskip

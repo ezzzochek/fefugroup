@@ -33,8 +33,6 @@
 	a4paper
 }
 
-\def\wb@parindent{1.25cm}
-
 \IfFontExistsTF{Times New Roman}{%
 	\setmainfont{Times New Roman}%
 }{\IfFontExistsTF{Liberation Serif}{%
@@ -81,11 +79,13 @@
 \def\huge{\fontsize{20pt}{24pt}\selectfont\ttfamily@set{17.28pt}{24pt}}
 \def\Huge{\fontsize{22pt}{26.4pt}\selectfont\ttfamily@set{20pt}{26.4pt}}
 
+\newdimen\wb@parindent\wb@parindent1.25cm
+\newskip\wb@parskip\wb@parskip\z@ plus1em minus 0.1em
+\newcount\wb@secsecvpenalty\wb@secsecvpenalty\@highpenalty
+
 \DeclarePrintbibliographyDefaults{title=Список библиографических источников}
 
 \pagestyle{empty}
-
-\def\@parindent{\@z}
 
 \hbadness=10000
 
@@ -161,21 +161,22 @@
 	\def\XeLaTeX{XeLaTeX}
 }
 
-\NewDocumentCommand{\wb@addchapter}{m}{%
-	\clearpage
-	\parindent\z@\par
+\newif\if@wb@aftersection\@wb@aftersectionfalse
+
+\def\wb@addchapter#1{
 	{\centering\bfseries#1\par}
-	\vspace{1ex}
-	\setlength{\parindent}{\wb@parindent}\par
+	\parindent\wb@parindent
 	\nobreak\@afterheading
 }
 
-\NewDocumentCommand{\wb@chapter}{sm} {
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\wb@chapter}{som} {
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\remove_trailing_period:N \l_tmpa_tl
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\str_if_eq:eeTF{\str_foldcase:V \l_tmpa_tl}{\str_foldcase:n{введение}}{\pagestyle{plain}}{}
 	\str_if_eq:eeTF{\str_foldcase:V \l_tmpa_tl}{\str_foldcase:n{предисловие}}{\pagestyle{plain}}{}
+	\clearpage
+	\parindent\z@
 	\IfBooleanTF{#1}{
 		\tl_set:Nx \l_tmpb_tl {\text_uppercase:n{\tl_use:N \l_tmpa_tl}}
 	}{
@@ -184,11 +185,16 @@
 	}
 	\wb@addchapter{\tl_use:N \l_tmpb_tl}
 	\addcontentsline{toc}{chapter}{\tl_use:N \l_tmpb_tl}
+	\@wb@aftersectiontrue\everypar{\@wb@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
+	\vskip1ex plus 0.5ex minus 0.2ex
 }
 
-\NewDocumentCommand{\wb@appendix}{sm} {
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\wb@appendix}{som} {
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\remove_trailing_period:N \l_tmpa_tl
+	\clearpage
+	\parindent\z@
 	\IfBooleanTF{#1}{
 		\captionsetup*[figure]{figurewithin=none}
 		\captionsetup*[table]{tablewithin=none}
@@ -201,85 +207,102 @@
 		\wb@addchapter{Приложение\ \protect{\@Alph\theappendix}\\\tl_use:N \l_tmpa_tl}
 		\addcontentsline{toc}{chapter}{Приложение\ \protect{\@Alph\theappendix}.\ \tl_use:N \l_tmpa_tl}
 	}
+	\@wb@aftersectiontrue\everypar{\@wb@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
+	\vskip1ex plus 0.5ex minus 0.2ex
 }
 
 \RenewDocumentCommand{\chapter}{}{\wb@chapter}
 
 \NewDocumentCommand{\wb@addsection}{m}{
-	\parindent\z@\ifhmode\par\fi\addvspace{1ex}
 	{\centering\bfseries#1\par}
 	\nobreak\@afterheading
-	\setlength{\parindent}{\wb@parindent}%\par\nobreak\@afterheading
-	\vspace{1ex}
+	\parindent\wb@parindent
 }
 
-\NewDocumentCommand{\wb@section}{sm}{%
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\wb@section}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+	\ifhmode\par\fi
+	\addvspace{1ex plus 0.5ex minus 0.1ex}
+	\parindent\z@
+	\if@wb@aftersection\penalty\wb@secsecvpenalty\fi
 	\IfBooleanTF {#1} {
-		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}%
-		\wb@addsection{\tl_use:N \l_tmpa_tl}%
+		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}
+		\wb@addsection{\tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{section}%
-		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}%
-		\wb@addsection{\protect{\thesection}.\ \tl_use:N \l_tmpa_tl}%
+		\refstepcounter{section}
+		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}
+		\wb@addsection{\protect{\thesection}.\ \tl_use:N \l_tmpa_tl}
 	}
+	\@wb@aftersectiontrue\everypar{\@wb@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
+	\vskip1ex plus 0.5ex minus 0.2ex
 }
 
 \RenewDocumentCommand{\section}{}{\wb@section}
 
 \NewDocumentCommand{\wb@addsubsection}{m}{
-	\parindent\z@\ifhmode\par\fi\addvspace{1ex}
 	{\centering\bfseries\itshape#1\par}
 	\par\nobreak\@afterheading
-	\setlength{\parindent}{\wb@parindent}%\par\nobreak\@afterheading
-	\vspace{1ex}
+	\parindent\wb@parindent
 }
 
-\NewDocumentCommand{\wb@subsection}{sm}{
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\wb@subsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+	\parindent\z@\ifhmode\par\fi
+	\addvspace{1ex plus 0.5ex minus 0.1ex}
+	\if@wb@aftersection\penalty\wb@secsecvpenalty\fi
 	\IfBooleanTF{#1}{
-		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
-		\wb@addsubsection{\tl_use:N \l_tmpa_tl}%
+		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}
+		\wb@addsubsection{\tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{subsection}%
-		\addcontentsline{toc}{subsection}{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}%
-		\wb@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}%
+		\refstepcounter{subsection}
+		\addcontentsline{toc}{subsection}{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}
+		\wb@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}
 	}
+	\@wb@aftersectiontrue\everypar{\@wb@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
+	\vskip1ex plus 0.5ex minus 0.2ex
 }
 
 \RenewDocumentCommand{\subsection}{}{\wb@subsection}
 
-\NewDocumentCommand{\wb@addsubsubsection}{m}{%
-	\par\addvspace{0.5em}\textbf{#1}\ 
-	%\nopagebreak%
+\NewDocumentCommand{\wb@addsubsubsection}{m}{
+	\textbf{#1}
+	\vadjust{\nobreak\@afterheading}
 }
 
-\NewDocumentCommand{\wb@subsubsection}{sm}{%
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\wb@subsubsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpb_tl
+	\ifhmode\par\fi
+	\addvspace{0.5em plus 0.5em minus 0.1em}
+	\if@wb@aftersection\penalty\wb@secsecvpenalty\fi
 	\IfBooleanTF{#1}{
-		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpb_tl}%
-		\wb@addsubsubsection{\tl_use:N \l_tmpa_tl}%
+		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpb_tl}
+		\wb@addsubsubsection{\tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{subsubsection}%
-		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpb_tl}%
-		\wb@addsubsubsection{\protect{\thesubsubsection}.\ \tl_use:N \l_tmpa_tl}%
+		\refstepcounter{subsubsection}
+		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpb_tl}
+		\wb@addsubsubsection{\protect{\thesubsubsection}.\ \tl_use:N \l_tmpa_tl}
 	}
+	\@wb@aftersectiontrue\everypar{\@wb@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
 }
 
 \RenewDocumentCommand{\subsubsection}{}{\wb@subsubsection}
 
 \RenewDocumentCommand{\appendix}{}{\par
 	\newcounter{appendix}
-	\committotalcounters{}%
+	\committotalcounters{}
 	\renewcommand{\appendixname}{}
-	\gdef\thechapter{\@Alph\c@appendix}%
+	\gdef\thechapter{\@Alph\c@appendix}
 	\renewcommand{\chapter}{\wb@appendix}
 }
 \ExplSyntaxOff
@@ -628,17 +651,18 @@
 \counterwithin{wb@assignment}{chapter}
 \NewDocumentCommand{\assignmentlist}{O{Задачи\ для\ самостоятельного\ решения}}{\section*{#1}\setcounter{wb@assignment}{\z@}}
 \NewDocumentCommand{\assignment}{+o} {
+	\ifhmode\par\fi\parindent\z@
+	\addvspace{1ex}
+	\if@wb@aftersection\penalty\wb@secsecvpenalty\fi
 	\refstepcounter{wb@assignment}
-	\parindent\z@\ifhmode\par\fi\addvspace{1ex}
-	\bfseries\itshape
-	\hspace{\fill}
-		Задача\ \thewb@assignment\relax\IfValueT{#1}{.\ #1.}
-	\hspace*{\fill}
-	\normalfont
-	\setlength{\parindent}{\wb@parindent}\par\nobreak\@afterheading
+	{\centering\bfseries\itshape{}Задача\ \thewb@assignment\relax\IfValueT{#1}{.\ #1.}\par\nobreak\@afterheading}
+	\parindent\wb@parindent
+	\@wb@aftersectiontrue\everypar{\@wb@aftersectionfalse\everypar{}}
 }
 
 \ExplSyntaxOff
 \let\totalprintlists@base\totalprintlists
 \renewcommand{\totalprintlists}{\@ifstar{\totalprintlists@base*{250}{2159}}{\totalprintlists@base{250}{2159}}}
 \input{details/contractions.def}
+
+\parskip\wb@parskip

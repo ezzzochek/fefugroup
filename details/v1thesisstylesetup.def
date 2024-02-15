@@ -9,7 +9,6 @@
 	mag = 1000,
 	a4paper
 }
-\def\th@parindent{1.25cm}
 
 \IfFontExistsTF{Times New Roman}{%
 	\setmainfont{Times New Roman}%
@@ -53,6 +52,10 @@
 \def\normalsize{\fontsize{14pt}{21pt}\selectfont\ttfamily@set{12pt}{21pt}}
 \def\large{\fontsize{17.28pt}{25.92pt}\selectfont\ttfamily@set{17.28pt}{25.92pt}}
 
+\newdimen\th@parindent\th@parindent1.25cm
+\newskip\th@parskip\th@parskip\z@ plus 1em minus 0.5em
+\newcount\th@secsecvpenalty\th@secsecvpenalty=1350
+
 \DeclarePrintbibliographyDefaults{title=Список использованных источников}
 
 \pagestyle{empty}
@@ -80,7 +83,7 @@
 	singlelinecheck=false
 }
 
-\setlength{\intextsep}{2em}
+\setlength{\intextsep}{2em} %distance between text and a float inside text
 
 \AtBeginDocument{%
 %algorithm2e redefinition in case it is used
@@ -125,123 +128,143 @@
 	\tl_use:N \l_tmpa_tl
 }
 
-\NewDocumentCommand{\thesis@addchapter}{m}{%
-	\clearpage
-	\par\parindent\z@%
-	\begin{center}
-	{\Large\bfseries#1}%
-	\end{center}
-	\par%
-	\nopagebreak%
-	\vspace*{2em}%
-	\setlength{\parindent}{\th@parindent}%
+\newif\if@th@aftersection\@th@aftersectionfalse
+
+\def\th@addchapter#1{
+	{\centering\bfseries#1\par}
+	\nobreak\@afterheading
+	\parindent\th@parindent
 }
 
-\NewDocumentCommand \thesis@chapter {sm} {
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand \th@chapter {som} {
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
 	\str_if_eq:eeTF{\str_foldcase:V \l_tmpa_tl}{\str_foldcase:n{введение}}{\pagestyle{plain}}{}
+	\clearpage
+	\parindent\z@
 	\IfBooleanTF{#1}{
 		\tl_set:Nn \l_tmpb_tl {\text_uppercase:n{\tl_use:N \l_tmpa_tl}}
 	}{
 		\refstepcounter{chapter}
 		\tl_set:Nn \l_tmpb_tl {\thechapter\ \text_uppercase:n{\tl_use:N \l_tmpa_tl}}
 	}
-	\thesis@addchapter{\l_tmpb_tl}
+	\th@addchapter{\l_tmpb_tl}
 	\addcontentsline{toc}{chapter}{\l_tmpb_tl}
+	\@th@aftersectiontrue\everypar{\@th@aftersectionfalse}
+	\IfValueT{#2}{\label{#2}}
+	\vskip2em
 }
-\NewDocumentCommand\thesis@appendix {sm} {
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand\th@appendix {som} {
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+	\clearpage
+	\parindent\z@
 	\IfBooleanTF{#1}{
 		\captionsetup*[figure]{figurewithin=none}
 		\captionsetup*[table]{tablewithin=none}
 		\setcounter{figure}{\z@}
 		\setcounter{table}{\z@}
-		\thesis@addchapter{Приложение\\\tl_use:N \l_tmpa_tl}
+		\th@addchapter{Приложение\\\tl_use:N \l_tmpa_tl}
 		\addcontentsline{toc}{chapter}{Приложение.\ \tl_use:N \l_tmpa_tl}
 	}{
 		\refstepcounter{appendix}
-		\thesis@addchapter{Приложение\ \@Alph\theappendix\\\tl_use:N \l_tmpa_tl}
+		\th@addchapter{Приложение\ \@Alph\theappendix\\\tl_use:N \l_tmpa_tl}
 		\addcontentsline{toc}{chapter}{Приложение\ \@Alph\theappendix.\ \tl_use:N \l_tmpa_tl}
 	}
+	\@th@aftersectiontrue\everypar{\@th@aftersectionfalse}
+	\IfValueT{#2}{\label{#2}}
+	\vskip2em
 }
 
-\RenewDocumentCommand{\chapter}{}{\thesis@chapter}
+\RenewDocumentCommand{\chapter}{}{\th@chapter}
 
-\NewDocumentCommand{\thesis@addsection}{m}{%
-	\vspace*{0.5em}%
-	%\par\parindent\z@%
-	\par\textbf{#1}\par%
-	\nopagebreak%
-	\vspace*{1em}%
-	%\setlength{\parindent}{\th@parindent}%
+\def\th@addsection#1{
+	\textbf{#1}
+	\par\nobreak
+	\@afterheading
+	\parindent\th@parindent
 }
 
-\NewDocumentCommand{\thesis@section}{sm}{
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\th@section}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+	\par\parindent\z@
+	\ifhmode\par\fi
+	\addvspace{0.5em plus 0.5em minus 0.4em}
+	\if@th@aftersection\penalty\th@secsecvpenalty\fi
 	\IfBooleanTF{#1}{
-		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}%
-		\thesis@addsection{\tl_use:N \l_tmpa_tl}%
+		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}
+		\th@addsection{\tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{section}%
-		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}%
-		\thesis@addsection{\hbox to 1cm{\protect{\thesection}}\tl_use:N \l_tmpa_tl}%
+		\refstepcounter{section}
+		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}
+		\th@addsection{\hbox to 1cm{\protect{\thesection}}\tl_use:N \l_tmpa_tl}
 	}
+	\@th@aftersectiontrue\everypar{\@th@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
+	\vskip0.5em plus 0.5em minus 0.4em
 }
-\RenewDocumentCommand{\section}{}{\thesis@section}
+\RenewDocumentCommand{\section}{}{\th@section}
 
-\NewDocumentCommand{\thesis@addsubsection}{m}{%
-	\vspace*{0.5em}%
-	\par\parindent\z@%
-	\par\textbf{\textit{#1}}\par%
-	\nopagebreak%
-	\setlength{\parindent}{\th@parindent}%
+\NewDocumentCommand{\th@addsubsection}{m}{
+	\textbf{\textit{#1}}
+	\par\nobreak\parindent\th@parindent
+	\@afterheading
 }
 
-\NewDocumentCommand{\thesis@subsection}{sm}{
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\th@subsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+	\parindent\z@
+	\ifhmode\par\fi
+	\addvspace{0.5em plus 0.5em minus 0.4em}
+	\if@th@aftersection\penalty\th@secsecvpenalty\fi
 	\IfBooleanTF{#1}{
-		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
-		\thesis@addsubsection{\tl_use:N \l_tmpa_tl}%
+		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}
+		\th@addsubsection{\tl_use:N \l_tmpa_tl}
 	}{
-		\refstepcounter{subsection}%
-		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}%
-		\thesis@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}%
+		\refstepcounter{subsection}
+		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}
+		\th@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}
 	}
+	\@th@aftersectiontrue\everypar{\@th@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
 }
 
-\RenewDocumentCommand{\subsection}{}{\thesis@subsection}
+\RenewDocumentCommand{\subsection}{}{\th@subsection}
 
-\NewDocumentCommand{\thesis@addsubsubsection}{m}{
-	\vspace*{0.5em}%
-	\par\parindent\z@%
-	\textbf{#1}%
-	\nopagebreak%
-	\setlength{\parindent}{\th@parindent}%
+\NewDocumentCommand{\th@addsubsubsection}{m}{
+	\textbf{#1}
+	\parindent\th@parindent
+	\vadjust{\nobreak\@afterheading}
 }
 
-\NewDocumentCommand{\thesis@subsubsection}{sm}{
-	\tl_set:Nn \l_tmpa_tl {#2}
+\NewDocumentCommand{\th@subsubsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
 	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
 	\remove_trailing_period:N \l_tmpa_tl
+	\parindent\z@
+	\ifhmode\par\fi
+	\addvspace{0.5em plus 0.5em minus 0.4em}
+	\if@th@aftersection\penalty\th@secsecvpenalty\fi
 	\IfBooleanTF{#1}{
-		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}%
-		\thesis@addsubsubsection{#2}%
+		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}
+		\th@addsubsubsection{\tl_use:N \l_tmpb_tl}
 	}{
-		\refstepcounter{subsubsection}%
-		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}%
-		\thesis@addsubsubsection{\protect{\thesubsubsection}.\ #2}%
+		\refstepcounter{subsubsection}
+		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}
+		\th@addsubsubsection{\protect{\thesubsubsection}.\ \tl_use:N \l_tmpb_tl}
 	}
+	\@th@aftersectiontrue\everypar{\@th@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
 }
 
-\RenewDocumentCommand{\subsubsection}{}{\thesis@subsubsection}
+\RenewDocumentCommand{\subsubsection}{}{\th@subsubsection}
 
 \ExplSyntaxOff
 
@@ -252,7 +275,7 @@
 	\committotalcounters{}%
 	\renewcommand{\appendixname}{}
 	\gdef\thechapter{\@Alph\c@appendix}%
-	\renewcommand{\chapter}{\thesis@appendix}
+	\renewcommand{\chapter}{\th@appendix}
 }
 \newcounter{itemlistctr}
 \newcommand{\makenumlabel}[1]{#1.\hfill}
@@ -268,7 +291,7 @@
      \setlength{\itemindent}{2cm}
      \setlength{\itemsep}{\z@}
      \setlength{\parsep}{\z@}
-     \setlength{\parskip}{\z@}
+     %\setlength{\parskip}{\z@}
      \setlength{\partopsep}{\z@}
      \let\makelabel=\makenumlabel
     }
@@ -341,3 +364,4 @@
 
 %\titleformat{\chapter}[display]{}{}{\z@}{}[]
 
+\parskip=\th@parskip
