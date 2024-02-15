@@ -132,6 +132,10 @@
 	\renewcommand\tableofcontents{\@toc\thispagestyle{empty}\clearpage}
 }
 
+\pdfstringdefDisableCommands{%
+	\def\XeLaTeX{XeLaTeX}
+}
+
 \ExplSyntaxOn
 \cs_new_protected:Nn \remove_trailing_period:N {
 	\regex_replace_once:nnN {(.*)\.$} {\1} #1

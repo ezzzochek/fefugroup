@@ -116,6 +116,10 @@
 	\renewcommand\tableofcontents{\clearpage\@toc}
 }
 
+\pdfstringdefDisableCommands{%
+	\def\XeLaTeX{XeLaTeX}
+}
+
 \ExplSyntaxOn
 
 \cs_new_protected:Nn \remove_trailing_period:N {

@@ -147,6 +147,10 @@
 	\renewcommand\tableofcontents{\clearpage\@toc\thispagestyle{empty}\normalsize}
 }
 
+\pdfstringdefDisableCommands{%
+	\def\XeLaTeX{XeLaTeX}
+}
+
 \ExplSyntaxOn
 \cs_new_protected:Nn \remove_trailing_period:N {
 	\regex_replace_once:nnN {(.*)\.$} {\1} #1
@@ -155,10 +159,6 @@
 	\tl_set:Nn \l_tmpa_tl {#1}
 	\remove_trailing_period:N \l_tmpa_tl
 	\tl_use:N \l_tmpa_tl
-}
-
-\pdfstringdefDisableCommands{%
-	\def\XeLaTeX{XeLaTeX}
 }
 
 \newif\if@wb@aftersection\@wb@aftersectionfalse
