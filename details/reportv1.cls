@@ -140,14 +140,12 @@
 	\tl_use:N \l_tmpa_tl
 }
 
-\newcommand{\report@addsection}[1]{%
-	\vspace*{0.5em}%
-	\par\parindent\z@%
-	\textbf{#1}%
-	\par%
-	\nopagebreak%
-	\vspace*{0.5em}%
-	\setlength{\parindent}{1cm}%
+\newcommand{\report@addsection}[1]{
+	\ifhmode\par\fi\addvspace{2ex}\parindent\z@
+	\textbf{#1}
+	\par\nobreak\@afterheading
+	\vspace{1ex}
+	\setlength{\parindent}{1cm}
 }
 
 \NewDocumentCommand{\report@section}{sm}{
@@ -166,12 +164,12 @@
 
 \RenewDocumentCommand{\section}{}{\report@section}
 
-\NewDocumentCommand{\report@addsubsection}{m}{%
-	\vspace*{0.5em}%
-	\par\parindent\z@%
-	\textbf{#1}%
-	\nopagebreak%
-	\setlength{\parindent}{1cm}%
+\NewDocumentCommand{\report@addsubsection}{m}{
+	\ifhmode\par\fi\addvspace{1ex}\parindent\z@
+	\textbf{#1}
+	\par\nobreak\@afterheading
+	\addvspace{1ex}
+	\setlength{\parindent}{1cm}
 }
 
 \NewDocumentCommand{\report@subsection}{sm}{
@@ -181,22 +179,22 @@
 	\remove_trailing_period:N \l_tmpa_tl
 	\IfBooleanTF{#1}{
 		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}%
-		\report@addsubsection{\tl_use:N \l_tmpa_tl.}%
+		\report@addsubsection{\tl_use:N \l_tmpa_tl}%
 	}{
 		\refstepcounter{subsection}%
 		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}%
-		\report@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpb_tl}%
+		\report@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}%
 	}
 }
 
 \RenewDocumentCommand{\subsection}{}{\report@subsection}
 
-\NewDocumentCommand{\report@addsubsubsection}{m}{%
-	\vspace*{0.5em}%
-	\par\parindent\z@%
-	\textbf{\textit{#1}\ }%
-	\nopagebreak%
-	\setlength{\parindent}{1cm}%
+\NewDocumentCommand{\report@addsubsubsection}{m}{
+	\vspace*{0.5em}
+	\par\parindent\z@
+	\textbf{\textit{#1}\ }
+	\nopagebreak
+	\setlength{\parindent}{1cm}
 }
 
 \NewDocumentCommand{\report@subsubsection}{sm}{
@@ -229,23 +227,23 @@
 
 \newcounter{itemlistctr}
 \newcommand{\makenumlabel}[1]{#1.\hfill}
-\newenvironment{itemlist}
-{
-	\begin{list}
-    {\arabic{itemlistctr}}
-    {\usecounter{itemlistctr}
-     \setlength{\labelwidth}{1cm}
-     \setlength{\labelsep}{0cm}
-     \setlength{\leftmargin}{\z@}
-     \setlength{\rightmargin}{\z@}
-     \setlength{\itemindent}{2cm}
-     \setlength{\itemsep}{\z@}
-     \setlength{\parsep}{\z@}
-     \setlength{\parskip}{\z@}
-     \setlength{\partopsep}{\z@}
-     \let\makelabel=\makenumlabel
-    }
- }
+\newenvironment{itemlist}%
+{%
+	\begin{list}%
+    {\arabic{itemlistctr}}%
+    {\usecounter{itemlistctr}%
+     \setlength{\labelwidth}{1cm}%
+     \setlength{\labelsep}{0cm}%
+     \setlength{\leftmargin}{\z@}%
+     \setlength{\rightmargin}{\z@}%
+     \setlength{\itemindent}{2cm}%
+     \setlength{\itemsep}{\z@}%
+     \setlength{\parsep}{\z@}%
+     \setlength{\parskip}{\z@}%
+     \setlength{\partopsep}{\z@}%
+     \let\makelabel=\makenumlabel%
+    }%
+}%
 {\end{list}}
 
 \DeclareNameAlias{author}{family-given}

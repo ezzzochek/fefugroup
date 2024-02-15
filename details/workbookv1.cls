@@ -142,7 +142,7 @@
 \interfootnotelinepenalty=\@M
 
 \AtBeginDocument{%
-	\renewcommand\contentsname{\hspace{\fill}{\bfseries{}ОГЛАВЛЕНИЕ}\hspace*{\fill}\vspace{1em}\par\nopagebreak}
+	\renewcommand\contentsname{\hspace{\fill}{\bfseries{}ОГЛАВЛЕНИЕ}\hspace*{\fill}\vspace{1em}\par\nobreak\@afterheading}
 	\let\@toc\tableofcontents%
 	\renewcommand\tableofcontents{\clearpage\@toc\thispagestyle{empty}\normalsize}
 }
@@ -165,9 +165,9 @@
 	\clearpage
 	\parindent\z@\par
 	{\centering\bfseries#1\par}
-	\vspace{1ex}%
-	\setlength{\parindent}{\wb@parindent}\par%
-	\nopagebreak%
+	\vspace{1ex}
+	\setlength{\parindent}{\wb@parindent}\par
+	\nobreak\@afterheading
 }
 
 \NewDocumentCommand{\wb@chapter}{sm} {
@@ -206,10 +206,10 @@
 \RenewDocumentCommand{\chapter}{}{\wb@chapter}
 
 \NewDocumentCommand{\wb@addsection}{m}{
-	\parindent\z@\ifvmode\else\par\fi\addvspace{1ex}
+	\parindent\z@\ifhmode\par\fi\addvspace{1ex}
 	{\centering\bfseries#1\par}
-	\nopagebreak
-	\setlength{\parindent}{\wb@parindent}\par
+	\nobreak\@afterheading
+	\setlength{\parindent}{\wb@parindent}%\par\nobreak\@afterheading
 	\vspace{1ex}
 }
 
@@ -229,11 +229,11 @@
 
 \RenewDocumentCommand{\section}{}{\wb@section}
 
-\NewDocumentCommand{\wb@addsubsection}{m}{%
-	\parindent\z@\ifvmode\else\par\fi\addvspace{1ex}
+\NewDocumentCommand{\wb@addsubsection}{m}{
+	\parindent\z@\ifhmode\par\fi\addvspace{1ex}
 	{\centering\bfseries\itshape#1\par}
-	\nopagebreak%
-	\setlength{\parindent}{\wb@parindent}\par
+	\par\nobreak\@afterheading
+	\setlength{\parindent}{\wb@parindent}%\par\nobreak\@afterheading
 	\vspace{1ex}
 }
 
@@ -255,7 +255,7 @@
 
 \NewDocumentCommand{\wb@addsubsubsection}{m}{%
 	\par\addvspace{0.5em}\textbf{#1}\ 
-	\nopagebreak%
+	%\nopagebreak%
 }
 
 \NewDocumentCommand{\wb@subsubsection}{sm}{%
@@ -617,13 +617,13 @@
 \NewDocumentCommand{\assignmentlist}{O{Задачи\ для\ самостоятельного\ решения}}{\section*{#1}\setcounter{wb@assignment}{\z@}}
 \NewDocumentCommand{\assignment}{+o} {
 	\refstepcounter{wb@assignment}
-	\parindent\z@\ifvmode\else\par\fi\addvspace{1ex}
+	\parindent\z@\ifhmode\par\fi\addvspace{1ex}
 	\bfseries\itshape
 	\hspace{\fill}
 		Задача\ \thewb@assignment\relax\IfValueT{#1}{.\ #1.}
 	\hspace*{\fill}
 	\normalfont
-	\setlength{\parindent}{\wb@parindent}\par\nopagebreak
+	\setlength{\parindent}{\wb@parindent}\par\nobreak\@afterheading
 }
 
 \ExplSyntaxOff
