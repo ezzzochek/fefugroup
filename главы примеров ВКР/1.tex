@@ -11,9 +11,8 @@
 В представленном материале сначала рассматривается случай двоичных БПФ, а зетем это рассуждение обобщается и на иные случаи.
 \section{Алгоритм Radix-2 DIT-FFT}
 Этот алгоритм основан на разложении последовательности из $N$ точек (предположим, $N = 2^l$, $l\in\mathbb{Z}$) на две последовательности $N$ из 2 точек (одна из четных выборок, а другая из нечетных выборок) и получении DFT из N точек в терминах DFT этих двух последовательностей. Эта операция сама по себе приводит к некоторой экономии арифметических операций. Алгоритм схематично представлен на рисунках \ref{figure: one decimation} и \ref{figure: multi-decimation}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics{thesisexample-images/f1}
 \begin{tikzpicture}[x=7cm, y=-1cm, every node/.style={align=center}]
 \node (top) {$X_k^F =\{x_0, x_1, x_2, x_3, x_4, \dots{}, x_{N-2}, x_{N-1}\}$};
 \draw (top.south) -- ++(0, 0.5) coordinate(j) -| ++(-0.5, 0.5) node[anchor=north] (even) {Чётные отсчёты\\$G_k^F = \{x_0, x_2, x_4, \dots{}, x_{N-2}\}$};
@@ -22,9 +21,8 @@
 \caption{Разложение последовательности из $N$ точек на две последовательности}
 \label{figure: one decimation}
 \end{figure}
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=\textwidth]{thesisexample-images/f2}
 \begin{tikzpicture}[x=4cm, y=-1cm, every node/.style={align=center}]
 \node (top) {$\{x_0, x_1, x_2, x_3, x_4, \dots{}, x_{N-2}, x_{N-1}\}$};
 \node[right=0.1cm of top, align=left] {Дискретизация: $T$\\Разрешение:$\frac{1}{N T} = f_0$};
@@ -51,7 +49,7 @@
 
 Подобно этому, существуют алгоритмы Radix-2 DIF, Radix-4 DIT, Radix-4 DIF.
 На рисунке \ref{figure: fft-butterfly} приведён граф разложения по частоте восьмиточечного ДПФ в двухточечные вычисления ДПФ.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{tikzpicture}[x=1.5cm,y=-1cm, state/.style={shape=circle,fill=white,draw,inner sep=0.1cm}, decoration={markings, mark=at position 0.5 with {\arrow{Latex}}}, DFT/.style={shape=rectangle, draw, align=center}]
 \foreach \x in {0,1,2,3,4,5,6,7} {
@@ -109,7 +107,7 @@
 \section{Быстрые алгоритмы с помощью разреженной матричной факторизации}
 Путем перестановки строк $[W_N^{nk}]$ в обратном порядке битов (BRO), он может быть учтен в $\log_2 N$ разреженных матриц, т.е. $[W_N^{nk} ]_BRO=[A_1][A_1] \dots [A_{\log_2 N}]$, где $N$ - целочисленная степень 2.
 Это проиллюстрировано для $N = 8$ на рисунке \ref{figure: fft-butterfly-sparse}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{tikzpicture}[x = 1.5cm, y = -1.5cm]
 \begin{scope}[
@@ -177,9 +175,8 @@ N = 12 = 3 \cdot 4 = 3 \cdot 2 \cdot 2.
 \end{equation}
 
 Разложение 12-точечной последовательности для DIT-FFT принимает вид, изображённый на рисунке \ref{figure: 12 point decomposition}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=0.9\textwidth]{thesisexample-images/f5}
 \begin{tikzpicture}[x=3.5cm, y=-1.5cm]
 \draw (0, 0) node[anchor=south] {$\{x_0, x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, x_{10}, x_{11}\}$} -- ++(0, 0.5) coordinate
 	(j) -| ++(-1, 0.5) node[anchor=north] (r3l) {$\{x_0, x_3, x_6, x_9\}$}
@@ -205,9 +202,8 @@ N = 12 = 3 \cdot 4 = 3 \cdot 2 \cdot 2.
 Объединение radix-2 и radix-4 в результате даёт так называемый \textit{Split-Radix FFT} алгоритм, который имеет ряд преимуществ, включая наименьшее количество умножений/сложений между двумя алгоритмами. Алгоритм основан на наблюдении, что на каждом этапе значение radix-4 лучше для нечетных коэффициентов DFT, а значение radix-2 лучше для четных коэффициентов DFT.
 
 Схему алгоритма можно наблюдать на рисунке \ref{figure: split-radix}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=0.9\textwidth]{thesisexample-images/f6}
 \begin{tikzpicture}[x=1cm, y=-1cm]
 \foreach \x in {0, 1} {
 	\edef\xx{\the\numexpr\x * 7}
@@ -272,9 +268,8 @@ n_1 = 0, 1, \dots, N_1 - 1 \text{ и } n_2 = 0, 1, \dots, N_2 - 1.
 \end{gathered}\end{equation}
 
 Символически векторный алгоритм radix-2 2-D DIT-FFT может быть представлен образом, представленным на рисунке \ref{figure: 2d vector fft}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=0.9\textwidth]{thesisexample-images/f7}
 \begin{tikzpicture}[x=3cm, y=-1cm]
 \draw (0, 0) node (root) {$(N_1 \times N_2)$-БПФ} +(2, 0) node {$N_1 = 2^{n_1}$, $N_2 = 2^{n_2}$}
 	(root.south) -- +(0, 0.5) coordinate (j1);
@@ -342,9 +337,8 @@ W_N^{k_1 + k_2} S_{11}(k_1, k_2)
 где $k_1, k_2 \in \mathbb{Z}_{\frac{N}{2}}$.
 
 Это матричное отношение может быть представлено в виде графа, представленного на рисунке \ref{fig: fft 2d butterfly}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=0.9\textwidth]{thesisexample-images/f9}
 \begin{tikzpicture}[x=2cm,y=-1cm,midarr/.style={postaction=decorate, decoration={markings, mark=at position 0.5 with \arrow{Latex}}},quadarr/.style={postaction=decorate, decoration={markings, mark=at position 0.25 with \arrow{Latex}}}]
 \foreach \y in {0, 1, 2, 3}
 	\foreach \x in {0, 1, 2, 3, 4}

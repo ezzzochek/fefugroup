@@ -16,9 +16,8 @@
 По заданию данный алгоритм необходимо ускорить путём векторного представления. Это выполнено с помощью набора векторных инструкций AVX-512 для процессоров Intel серии Core-X.
 
 Сначала входящие сигналы длиной 64 бита каждый разделяются на два 32-битовых символа, разделяясь на старший и младший символ, это изображено на блок-схеме на рисунке \ref{eq: vector operands example}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=0.7\textwidth]{thesisexample-images/f10}
 \begin{tikzpicture}[every node/.style={draw}, header/.style={draw=none}]
 \foreach \c\v/\V in {0/x/X, 6/y/Y} {
 	\node (\v h) at (\c,0) {$\v_{hi}$ (32 бит)};
@@ -31,9 +30,8 @@
 \end{figure}
 
 Далее выполняется операция, графически представленная на рисунке \ref{eq: vector vertical operation example}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[height=6em]{thesisexample-images/f11}
 \begin{tikzpicture}[x=2cm, y=-1.5cm]
 \foreach \v/\y in {x/0, y/1} {
 	\node[draw] (\v hi) at (0, \y) {$\v_{hi}$ (32 бит)};
@@ -58,9 +56,8 @@ $$
 Проверка выполняется путем сравнения суммы с одним из слагаемых, то есть переполнение возникает при $p_{hi}+p_{lo} < p_{hi}$  или $p_{hi}+p_{lo} < p_{lo}$.
 
 Программная реализация представлена на рисунке \ref{fig: avx512 32 bit multiplication}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=\textwidth]{thesisexample-images/f12}
 \begin{lstlisting}[language=C]
 __m512i p_hi = _mm512_mul_epu32(x_hi, y_hi);
 __m512i p_lo = _mm512_mul_epu32(x_lo, y_lo);
@@ -87,9 +84,8 @@ p = _mm512_mask_sub_epi64(p,
 
 Далее выполняется перекрёстное умножение разрядов --- старший на младший.
 Два полученных 32-битовых значения также суммируются (рис.~\ref{fig: vector cross-lane multiplication}) и проверяются на переполнение заданного максимального объёма в 64 бита.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[height=6em]{thesisexample-images/f13}
 \begin{tikzpicture}[x=2cm, y=-1.5cm]
 \foreach \v/\y in {x/0, y/1} {
 	\node[draw] (\v hi) at (0, \y) {$\v_{hi}$ (32 бит)};
@@ -113,9 +109,8 @@ p = _mm512_mask_sub_epi64(p,
 \end{figure}
 Результаты умножений вновь суммируются и проверяются на переполнение.
 Программная реализация представлена на рисунке \ref{fig: vector cross-lane multiplication}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=\textwidth]{thesisexample-images/f14}
 \begin{lstlisting}[language=C]
 __m512i p_m;
 x_hi = _mm512_mul_epu32(x_hi, y_lo);
@@ -144,9 +139,8 @@ p = _mm512_mask_sub_epi64(p,
 \section{Реализация ДПФ с помощью AVX-512}
 Для выполнения ДПФ вошедшие данные представляются в виде матрицы, над которой выполняется быстрое преобразование Фурье и, следом, обратное преобразование Фурье.
 Их программное представление можно наблюдать на рисунке \ref{fig: avx512 nnt}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
-%\includegraphics[width=\textwidth]{thesisexample-images/f15}
 \begin{lstlisting}[language=C]
 static void my_mm512_fft_epi64x2(
          __m512i time_lo, __m512i time_hi,
@@ -275,8 +269,7 @@ $$
 
 Результат прямого ДПФ отражает частотное представление входного сигнала, а результат обратного ДПФ --– его временн\'{о}е представление.
 Вышеописанные матрицы можно также собрать с помощью простого кода, представленного на рисунке \ref{fig: rotation matrix creation}.
-\begin{figure}[ht]
-%\includegraphics[width=\textwidth]{thesisexample-images/f16}
+\begin{figure}
 \begin{lstlisting}[language={[11]C++}]
 struct fft_matrix {
 	std::uint64_t alignas(64) fwd_powers[256];
@@ -303,8 +296,7 @@ constexpr fft_matrix_t fft_matrix = construct_power_matrix();
 Сначала устанавливаются индексы байтов, которые можно собрать из полученного 30-битового сигнала.
 Значения индексов отдельно друг от друга собираются в векторные регистры $xt$ и $yt$, над которыми далее выполняется быстрое преобразование Фурье.
 Программная реализация представлена на рисунке \ref{fig: vectorized ntt}.
-\begin{figure}[ht]
-%\includegraphics[width=\textwidth]{thesisexample-images/f17}
+\begin{figure}
 \begin{lstlisting}[language=C]
 __m256i vindex = _mm256i_set_epi32(0, 3, 6, 9, 12, 15, 18, 21);
 __m512i xt, yt, xfl, xfh, yfl, yfh, ptl, pth, pfl, pfh;
@@ -325,8 +317,7 @@ my_mm512_ifft_epi64x2(pfl, pfh, &ptl, &pth);
 \end{figure}
 
 Над полученными значениями выполняется рекомбинация для занесения результатов умножений в память (рис. \ref{fig: 32 bit vectorized recombination}).
-\begin{figure}[ht]
-%\includegraphics[width=\textwidth]{thesisexample-images/f18}
+\begin{figure}
 \begin{lstlisting}[language={[11]C++}]
 __m512i permute_ind = _mm512_set_epi64(6, 5, 4, 3, 2, 1, 0, 7);
 __m512i ones = _mm512_set1_epi64(~0ull);

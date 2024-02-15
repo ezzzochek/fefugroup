@@ -139,6 +139,15 @@
 %\cftsetindents{subsection}{\z@}{\z@}
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 
+\def\fps@figure{htbp}
+\def\fps@table{htbp}
+\setcounter{totalnumber}{5}
+\setcounter{topnumber}{5}
+\renewcommand{\topfraction}{.9}
+\renewcommand{\textfraction}{.1}
+\renewcommand{\bottomfraction}{.9}
+\renewcommand{\floatpagefraction}{0.8}
+
 \interfootnotelinepenalty=\@M
 
 \AtBeginDocument{%

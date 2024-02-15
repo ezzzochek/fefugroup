@@ -182,7 +182,7 @@
 Основные из них представлены в таблице \ref{таблица компиляторов}.
 Каждый из компиляторов обладает собственными особенностями применения, доступными функциями и расширениями оригинального языка \LaTeX{}.
 
-\begin{table}[ht]\small
+\begin{table}\small
 \centering
 \caption{Компиляторы языков \TeX{} и \LaTeX{}}
 \label{таблица компиляторов}
@@ -245,7 +245,7 @@ xelatex report-example
 
 В данном документе описано использование компиляторов MikTeX под Windows, хотя MikTeX также доступен для Linux и macOS, соответствующие программы также доступны для скачивания с официальных сайтов.
 
-\begin{table}[ht]\small
+\begin{table}\small
 \centering
 \caption{Бесплатные реализации компиляторов языков \TeX{} и \LaTeX{}}
 \label{таблица дистрибутивов}
@@ -261,7 +261,7 @@ MacTeX            & Mac                    & \url{https://www.tug.org/mactex/dow
 Комплект программ MikTeX кроме непосредственно всех компиляторов, перечисленных в таблице \ref{таблица компиляторов}, является также системой доступа к расширениям языка \LaTeX{}, которые чаще всего необходимы в различной практике верстки документов.
 Если компилируемым документом требуется наличие того или иного расширения языка \LaTeX, которое не установлено на компьютере, выполняющим компиляцию, возникает диалоговое окно, показанное на рис.~\ref{автоустановка расширений miktex}, позволяющее выполнить необходимую установку прямо во время компиляции.
 
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \includegraphics{workbook-extras/miktex-package-installation}
 \caption{Автоматическая установка расширений языка \LaTeX, требуемых документом, в процессе его компиляции}
@@ -272,7 +272,7 @@ MacTeX            & Mac                    & \url{https://www.tug.org/mactex/dow
 Несмотря на то, что дистрибутива достаточно для сборки большинства документов, а для полноценного набора текста достаточно стандартного блокнота (хотя Notepad++ \cite{npp} удобнее), для набора документов и автоматизации их сборки можно использовать среды верстки документов \LaTeX.
 В настоящем документе кратко описана бесплатная программа TeXstudio, распространяемая для Windows, Linux и Mac OS X и облегчающая набор и сборку документов \LaTeX{}.
 Пользовательский интерфейс программы представлен на рис. \ref{скриншот texstudio}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \includegraphics[width=\textwidth]{workbook-extras/texstudio}
 \caption{Среда верстки документов TeXstudio. Компиляция запускается нажатием на зеленую кнопку, с двойным треугольником вправо, сверху или клавишей F5}
@@ -280,7 +280,7 @@ MacTeX            & Mac                    & \url{https://www.tug.org/mactex/dow
 \end{figure}
 
 По умолчанию TeXstudio для компиляции всегда использует \texttt{pdflatex}, если иное специально не указано в настройках TeXstudio (рис.~\ref{texstudio-options}).
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \includegraphics[width=0.75\textwidth]{workbook-extras/texstudio-options}
 \caption{Выбор в среде TeXstudio компилятора \texttt{xelatex} осуществляется в настройках среды из меню "Options -> Configure TeXstudio..."}
@@ -313,7 +313,7 @@ MacTeX            & Mac                    & \url{https://www.tug.org/mactex/dow
 
 Отметим также, что использование параметров "\verb+% !TeX...+" иногда требует разрешения пользователя, которое запрашивается\footnote{Настройки компиляции позволяют вызывать произвольные программы на машине, на которой выполняется компиляция, поэтому могут быть использованы для реализации атаки на машину, и поэтому к файлам TEX, полученным из ненадежных источников и изменяющим существующие настройки TeXstudio следует относиться настороженно, примерно соответственно отношению к документам Word, скачанным из Интернет, о чём Word тоже предупреждает.} средой TeXstudio с помощью соответствующего диалогового окна (рис. \ref{скриншот предупреждения texstudio}).
 Для компиляции, например, настоящего учебного пособия требуется это разрешение предоставить.
-\begin{figure}[htb]
+\begin{figure}
 \centering
 \includegraphics[height=6cm]{workbook-extras/texstudio-rules-override}
 \caption{Предупреждение TeXstudio о том, что файл TEX запрашивает изменение существующих настроек TeXstudio под себя. Для сборки документа требуется нажать "(a) allow for this document" или "(b) allow for all documents"}
@@ -352,7 +352,7 @@ MacTeX            & Mac                    & \url{https://www.tug.org/mactex/dow
 \section{Структура документа}\label{раздел про структуру документа}
 Исходный текст документа в формате \LaTeX{} имеет одну и ту же базовую структуру и состоит из двух основных частей --- преамбулы и тела документа (рис.~\ref{структура документа latex}).
 
-\begin{figure}[ht]
+\begin{figure}
 \begin{lstlisting}[language={[LaTeX]TeX}]
 %Преамбула
 \documentclass[report]{fefudoc} %Класс документа
@@ -406,7 +406,7 @@ MacTeX            & Mac                    & \url{https://www.tug.org/mactex/dow
 Популярными являются такие расширения, как \texttt{amsmath} \cite{amsmath} и \texttt{mathtools} \cite{mathtools}, предоставляющие гибкие инструменты для написания формул; \texttt{geometry} \cite{geometry} для гибкой установки геометрии документа (например, размер листа, поля, ориентация), \texttt{fontspec} \cite{fontspec} для установки параметров используемых шрифтов, \texttt{graphicx} \cite{graphicx} и \texttt{adjustbox} \cite{adjustbox} для манипуляций включаемыми рисунками, \texttt{tikz} \cite{tikz-ctan} для рисования прямо в \LaTeX{}, \texttt{xcolor} \cite{xcolor} для задания цвета текста, \texttt{url} \cite{url-ctan} для включения Интернет-ссылок, \texttt{tabularx} \cite{tabularx} для гибкости работы с таблицами, \texttt{algorithm2e} \cite{algorithm2e} для описания алгоритмов, \texttt{biblatex} \cite{biblatex23} для автоматизации создания и поддержки списков литературы и множество других.
 
 Дистрибутив MikTeX предоставляет консоль (рис.~\ref{Консоль MikTeX}) для поиска, ручной установки, удаления и обновления требуемых расширений языка.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \includegraphics[width=12cm]{workbook-extras/miktex-console}
 \caption{Консоль MikTeX для управления и ручной установки расширений \LaTeX{}}
@@ -427,7 +427,7 @@ MacTeX            & Mac                    & \url{https://www.tug.org/mactex/dow
 \end{verbatim}
 
 Далее тело может содержать части (директива \texttt{\textbackslash part} для книг классов \texttt{book}), главы (для дипломов и диссертаций ДВФУ, учебных пособий, а также для стандартного класса \texttt{book} доступна директива \texttt{\textbackslash chapter}), разделы (директива \texttt{\textbackslash section}), подразделы (директива \texttt{\textbackslash subsection}), под-подразделы (директива \texttt{\textbackslash subsubsection}), параграфы (\texttt{\textbackslash paragraph}) и подпараграфы (\texttt{\textbackslash subparagraph}) (рис. \ref{разделы-подразделы}\footnote{Пробелы возле фигурных скобок не требуются. Расстановка их на рисунке обусловлена тем, что нелатинские алфавиты плохо поддерживаются расширением \texttt{\footnotesize listings}, используемым здесь для отображения исходного кода на \LaTeX{}. Подробности в разделе \ref{раздел про исходный код}.}).
-\begin{figure}[ht]
+\begin{figure}
 \begin{lstlisting}[language={[LaTeX]{TeX}}, literate={-}{-}1]
 \section{ Заголовок раздела }
  Текст раздела.
@@ -635,7 +635,7 @@ E = m c^2
 В дополнение к этим директивам существует директива \texttt{\textbackslash emph} (от англ. "emphasize"), а также её переключательная альтернатива \texttt{\textbackslash em}.
 Эта директива, в отличие от указанных в таблице \ref{таблица с методами выделения текста}, семантическая: она выделяет текст \emph{каким-то} образом --- тем, который определён классом документа, и является в некотором смысле интеллектуальной.
 
-\begin{table}[htbp]\small
+\begin{table}\small
 \caption{Директивы для выделения текста}
 \label{таблица с методами выделения текста}
 \begin{tabularx}{\textwidth}{|c|c|X|}
@@ -749,7 +749,7 @@ E = m c^2
 
 Если же автору всё же необходимо изменить размер текста, то предпочтительно делать это одной из директив таблицы \ref{таблица про размеры шрифта}.
 
-\begin{table}[ht]
+\begin{table}
 \caption{Директивы размеров шрифта в \LaTeX{}}
 \label{таблица про размеры шрифта}
 \centering
@@ -1237,7 +1237,7 @@ A, B, \Gamma, \Delta, E, Z, H, \Theta, I, K, \Lambda, M, N, \Xi, O, \Pi, P, \Sig
 
 \subsubsection{Дополнительные математические символы} приведены в \cite{wikibooks-mathematics, wikibooks-advanced-mathematics, oeis-mathematical-symbols, latex-mathematical-symbols-pdf, ComprehensiveLateXSymbolList}.
 В таблице \ref{таблица математических символов} приведены некоторые из них.
-\begin{table}[ht]\small
+\begin{table}\small
 \centering
 \caption{Широко распространенные символы, используемые в математических формулах, и соответствующие директивы \LaTeX{}}
 \begin{tabular}{|c|c||c|c||c|c|}
@@ -1771,7 +1771,7 @@ $$
 
 \assignment{}\label{task-formulae}
 Используя компилятор \texttt{xelatex}, реализуйте документ, показанный на рис.~\ref{рисунок к задаче про формулы}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \fbox{\includegraphics[width=0.9\textwidth]{workbook-extras/workbook-task}}
 \caption{Образец документа к задаче \ref{task-formulae}}
@@ -1953,7 +1953,7 @@ $$
 \end{figure}
 
 Иногда необходимо вставить несколько рисунков как один, расположив их рядом и задав частные и/или общую подрисуночную надпись, например как указано на рисунке \ref{составной рисунок}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \subfloat[левое изображение] {
    \label{составной рисунок 1}
@@ -1980,7 +1980,7 @@ $$
 
 Например, код, использованный для вставки рисунка \ref{составной рисунок} в документ \LaTeX{}, следующий:
 \begin{verbatim}
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \subfloat[левое изображение] {
    \label{составной рисунок 1}
@@ -2048,7 +2048,7 @@ $$
 
 Пример блок-схемы алгоритма на языке TikZ:
 \begin{verbatim}
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{tikzpicture}
  [
@@ -2114,7 +2114,7 @@ $$
 \end{verbatim}
 
 Результатом является рисунок \ref{блок-схема алгоритма на tikz}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{tikzpicture}
  [
@@ -2181,7 +2181,7 @@ $$
 Примеры графиков функций, описанных на языке TikZ,  приведены на рисунке \ref{sinc в tikz}.
 Эти графики получены в результате компиляции следующего кода \LaTeX{}.
 \begin{verbatim}
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \subfloat[в декартовых координатах]{
  \begin{tikzpicture}[scale=1.54] \datavisualization
@@ -2215,7 +2215,7 @@ $$
 \end{figure}
 \end{verbatim}
 
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \subfloat[в декартовых координатах]{
  \begin{tikzpicture}[scale=1.54] \datavisualization
@@ -2253,7 +2253,7 @@ $$
 \section{Таблицы}
 Набор таблиц в \LaTeX{} возможно оказывается наименее удобным из всех инструментов.
 Поэтому в Интернет \cite{tablesgenerator} и в средах разработки (рис. \ref{таблицы TeXstudio}) доступны средства для визуального создания таблиц, однако эти средства ограничены только стандартными таблицами и чаще не поддерживают дополнительных средств, предоставляемых расширениями.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \includegraphics[width=7cm]{workbook-extras/texstudio-tables}
 \caption{Визуальное создание таблиц в TeXstudio}
@@ -2267,7 +2267,7 @@ $$
 Синтаксис для описания таблиц во многом схож с описанием матриц в формулах, поскольку, также как и для описания матриц, для разграничения строк используется директива \textbackslash\textbackslash{} принудительного разрыва строк, а для разграничения столбцов --- символ амперсанда "\&".
 
 Стандартные таблицы строятся в окружении \texttt{tabular} и, в отличие от матриц, принимают в качестве параметра методы выравнивания и рисования границ для каждого столбца индивидуально, как указано в таблице \ref{таблица с параметрами tabular}.
-\begin{table}[ht]\small
+\begin{table}\small
 \centering
 \caption{Позиционные параметры таблицы \texttt{tabular}}
 \label{таблица с параметрами tabular}
@@ -2499,7 +2499,7 @@ $$
 
 Как указано в разделе \ref{плавающие рисунки}, для того, чтобы сделать рисунки плавающими блоками, используется окружение \texttt{figure}, и это окружение на самом деле можно использовать и для таблиц --- но тогда они будут оформлены и пронумерованы как рисунки:
 \begin{verbatim}
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{tabular}{l|lc}
 \textbf{ФИО}         & \textbf{Группа}      & \textbf{Телефон} \\
@@ -2512,7 +2512,7 @@ $$
 \end{figure}
 \end{verbatim}
 производит таблицу, представленную как рис.~\ref{таблица как рисунок}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{tabular}{l|lc}
 \textbf{ФИО}            & \textbf{Группа}      & \textbf{Телефон} \\
@@ -2530,7 +2530,7 @@ $$
 
 В действительности и рисунок можно вставить в документ как таблицу:
 \begin{verbatim}
-\begin{table}[ht]
+\begin{table}
 \centering
 \caption{Рисунок, вставленный как таблица}
 \label{рисунок как таблица}
@@ -2538,7 +2538,7 @@ $$
 \end{table}
 \end{verbatim}
 что производит "таблицу" \ref{рисунок как таблица}.
-\begin{table}[ht]
+\begin{table}
 \centering
 \caption{Рисунок, вставленный как таблица}
 \label{рисунок как таблица}
@@ -2892,7 +2892,7 @@ $$
 
 Например, идентификатор рисунка можно задать строкой "разд.2/рис.пример" следующим образом:
 \begin{verbatim}
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \includegraphics[height=2cm, width=\textwidth/2]{это рисунок}
 \caption{Пример рисунка}
@@ -2928,14 +2928,14 @@ f(x) = x^2
 \pageref{это рисунок}, а раздел \ref{раздел про исходный код}
 --- на странице \pageref{раздел про исходный код}.
 
-\section{Алгоритмы и исходный код}\label{раздел про исходный код}
+\section[раздел про исходный код]{Алгоритмы и исходный код}
 \subsection{Описание алгоритмов}\label{подраздел про алгоритмы}
 В \LaTeX{} существует множество способов описать алгоритм.
 \subsubsection{Добавление алгоритмов как рисунков.} Во-первых, алгоритм можно просто нарисовать и вставить в документ \LaTeX{} как обычный рисунок.
 Тогда для таких алгоритмов достаточно лишь операций и директив \LaTeX{}, которые описаны в разделе \ref{раздел про рисунки}.
 Пример блок-схемы, добавленной как изображение, показан на рисунке \ref{блок-схема алгоритма Эвклида на tikz}\footnote{Рисунок набран на языке TikZ (см. раздел \ref{раздел про рисование в latex}), его код можно просмотреть в исходном файле \LaTeX{} к настоящему документу.}.
 
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{tikzpicture}
  [
@@ -2996,7 +2996,7 @@ f(x) = x^2
 
 Примером использования окружения \texttt{algorithm} является алгоритм \ref{Пример algorithm2e - алгоритм Эвклида}, код которого следующий.
 \begin{verbatim}
-\begin{algorithm}[ht]
+\begin{algorithm}
 \KwData{целочисленные значения $x,y\in\mathbb{N}_0$}
 \KwResult{наибольший общий делитель $x$ и $y$}
 \While{$y \ne 0$}{
@@ -3013,7 +3013,7 @@ f(x) = x^2
 \end{algorithm}
 \end{verbatim}
 
-\begin{algorithm}[ht]
+\begin{algorithm}
 \KwData{целочисленные значения $x,y\in\mathbb{N}_0$}
 \KwResult{наибольший общий делитель $x$ и $y$}
 \While{$y \ne 0$}{
@@ -3041,7 +3041,7 @@ Cинтаксис обеих директив тот же, что и у \verb+\K
 
 Ещё один пример алгоритма \texttt{algorithm2e} представлен кодом
 \begin{verbatim}
-\begin{algorithm}[ht]
+\begin{algorithm}
 \DontPrintSemicolon
 \LinesNumbered
 \KwIn{Вектор $V \in \mathbb{N}^n$.}
@@ -3061,7 +3061,7 @@ Cинтаксис обеих директив тот же, что и у \verb+\K
 \end{algorithm}
 \end{verbatim}
 Компиляция данного кода в документе \LaTeX{} приводит к алгоритму \ref{if and for in algorithm2e}.
-\begin{algorithm}[ht]
+\begin{algorithm}
 \DontPrintSemicolon
 \LinesNumbered
 \KwIn{Вектор $V \in \mathbb{N}^n$.}
@@ -3097,7 +3097,7 @@ Cинтаксис обеих директив тот же, что и у \verb+\K
 Расширение \texttt{pgf-umlsd} определяет окружение \texttt{sequencediagram}, которое может включаться в состав плавающих блоков, обычно \texttt{figure} (см. раздел \ref{плавающие рисунки}).
 
 Примером диаграммы последовательностей, созданной с помощью \texttt{pgf-umlsd}, является диаграмма, представленная на рис.~\ref{пример pgf-umlsd}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \begin{sequencediagram}
 \newthread{clnt}{Клиент}
@@ -3122,7 +3122,7 @@ Cинтаксис обеих директив тот же, что и у \verb+\K
 
 Её \LaTeX{}-описание следующее.
 \begin{verbatim}
-\begin{figure}[ht]
+\begin{figure}
 \begin{sequencediagram}
 \newthread{clnt}{Клиент}
 \newinst[1.3]{dns}{Сервер адресов}
@@ -3268,7 +3268,7 @@ Cинтаксис обеих директив тот же, что и у \verb+\K
 
 Пример листинга программы на языке C++ приведён на рисунке~\ref{lstlisting C++ example}, который получен в результате компиляции следующего кода \LaTeX{}.
 \begin{verbatim}
-\begin{figure}[ht]
+\begin{figure}
 \begin{lstlisting}[language=C++]
 #include <iostream>
 
@@ -3283,7 +3283,7 @@ int main(int argc, char** argv) {
 \end{figure}
 \end{verbatim}
 
-\begin{figure}[ht]
+\begin{figure}
 \begin{lstlisting}[language=C++]
 #include <iostream>
 
@@ -3544,7 +3544,7 @@ int main(int argc, char** argv) {
 \assignment{}\label{task: Задание про таблицы}
 Реализуйте таблицу \ref{таблица к заданию}, используя расширение \texttt{tabularx}.
 
-\begin{table}[ht]
+\begin{table}
 \caption{Таблица к заданию \ref{task: Задание про таблицы}}
 \label{таблица к заданию}
 \centering
@@ -3571,7 +3571,7 @@ int main(int argc, char** argv) {
 Кратко расскажите про три своих любимых книги, примерно по одному--два абзаца на книгу.
 Книги перечислите в списке литературы, используя \texttt{biblatex}: создайте файл с библиографическим описанием книг, как указано в разделе~\ref{раздел про списки литературы}.
 Пример выполненного задания представлен на рис.~\ref{рисунок к задаче про любимые книги}.
-\begin{figure}[ht]
+\begin{figure}
 \centering
 \fbox{\includegraphics[width=0.9\textwidth]{workbook-extras/wb-fav-book}}
 \caption{Образец документа к задаче \ref{task-fav-book}}
@@ -3593,7 +3593,7 @@ int main(int argc, char** argv) {
 Тип документа класса \texttt{fefudoc} указывается параметром класса \texttt{\textbackslash documentclass[тип]\{fefudoc\}}.
 
 Типы документов, их назначение, файлы соответствующих примеров и файловые зависимости этих примеров приведены в таблице \ref{таблица типов fefudoc}.
-\begin{table}[ht]
+\begin{table}
 \small
 \caption{Типы документов класса fefudoc}
 \label{таблица типов fefudoc}
