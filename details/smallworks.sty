@@ -320,6 +320,8 @@
 \tl_new:N \tl_specialty_description
 \NewDocumentCommand{\@specialtycode}{}{\tl_use:N \tl_specialty_code}
 \NewDocumentCommand{\@specialtydescription}{}{\tl_use:N \tl_specialty_description}
+\newif\if@sw@barchelorprogram\@sw@barchelorprogramfalse
+\newif\if@sw@masterprogram\@sw@masterprogramfalse
 
 %\@setspecialty{12.34.56}[Description]
 \NewDocumentCommand{\@setspecialty}{mo}{
@@ -328,14 +330,14 @@
 		\tl_set:Nn \tl_specialty_description {#2}
 	}{
 		\decode_barchelor_specialty:Nn \tl_specialty_description {#1}
-		\str_if_empty:NT \tl_specialty_description {
+		\str_if_empty:NTF \tl_specialty_description {
 			\decode_master_specialty:Nn \tl_specialty_description {#1}
-			\str_if_empty:NT \tl_specialty_description {
+			\str_if_empty:NTF \tl_specialty_description {
 				\tl_set:Nn \tl_specialty_description {
 					\todo{НЕИЗВЕСТНАЯ\ СПЕЦИАЛЬНОСТЬ\ #1}
 				}
-			}
-		}
+			}{\@sw@masterprogramtrue}
+		}{\@sw@barchelorprogramtrue}
 	}
 }
 

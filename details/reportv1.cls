@@ -10,7 +10,23 @@
 \newcommand\discipline[1]{\def\@discipline{#1}}
 \newcommand\location[1]{\def\@location{#1}}
 \newcommand\specialty{\@setspecialty}
+\def\@Profile{}
 \newcommand\profile[1]{\def\@Profile{#1}}
+\def\@program{}
+\def\@programcode{}
+\def\@programbarchelorcode{b}
+\def\@programmastercode{m}
+\newcommand\program[2][]{%
+	\edef\@tmp{#1}
+	\ifx\@tmp\@programbarchelorcode
+		\let\@programcode\@programbarchelorcode
+	\else\ifx\@tmp\@programmastercode
+		\let\@programcode\@programmastercode
+	\else\ifx\@tmp\@empty\else
+		\ClassError{reportv1}{Неверный код образовательной программы #1. Используйте "b" для бакалавриата и "m" для магистратуры.}
+	\fi\fi\fi
+	\def\@program{#2}
+}
 \def\@teacherfullname{}
 \def\@teachershort{}
 \def\@teacherdegree{}
@@ -25,10 +41,28 @@
 	\vspace{3em}
 
 	\begin{center}
-	\textbf{РЕФЕРАТ}
-	
+	\textbf{РЕФЕРАТ}\par
+	\vspace{1em}
 	по дисциплине \quot{\@discipline} \\
-	направление \@specialtycode{}~\quot{\@specialtydescription{}} \\
+	направление \@specialtycode{}~\quot{\@specialtydescription{}}\par
+	\ifx\@Profile\@empty\else
+		профиль \quot{\@Profile}\par
+	\fi
+	\ifx\@program\@empty\else
+		\vspace{1em}
+		образовательная программа
+		\ifx\@programcode\@programbarchelorcode
+			бакалавриата
+		\else\ifx\@programcode\@programmastercode
+			магистратуры
+		\else\if@sw@barchelorprogram
+			бакалавриата
+		\else\if@sw@masterprogram
+			магистратуры
+		\fi\fi\fi\fi
+		\@program\par
+	\fi
+	\vspace{1em}
 	на тему \textbf{\quot{\@title}}
 	\end{center}
 
