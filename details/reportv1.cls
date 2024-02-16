@@ -4,19 +4,6 @@
 
 \LoadClass[oneside]{article}
 \RequirePackage{details/smallworks}
-\sw@parindent1cm
-
-\geometry{
-	paperwidth = 210mm,
-	paperheight = 297mm,
-	left = 3cm,
-	top = 2cm,
-	right = 1.5cm,
-	bottom = 2cm,
-	footskip = 1cm,
-	mag = 1000,
-	a4paper
-}
 
 \def\@group{}
 \renewcommand\author[2]{\def\@author{#2}\def\@authorshort{\@fullnameinitialslastname{#2}}\def\@group{#1}}
