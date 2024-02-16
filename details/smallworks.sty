@@ -1,0 +1,372 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{details/smallworks}[2024/02/16 V0.1 Андрей Чусов]
+
+\RequirePackage[russian]{babel}
+\babelprovide[alph=lower, Alph=upper]{russian}
+\RequirePackage[sortcites,backend=biber,autocite=plain,sorting=nty,giveninits=true]{biblatex}
+\renewcommand*{\bibfont}{\Large}
+\RequirePackage[paper=a4paper]{geometry}
+\RequirePackage{fontspec}
+\RequirePackage{details/fefudocelements}
+\RequirePackage{caption}
+\RequirePackage{fancyhdr}
+\RequirePackage{titlesec}
+\RequirePackage{tocloft}
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+\RequirePackage{etoolbox}
+\RequirePackage[pdfencoding=auto, hidelinks]{hyperref}
+\RequirePackage[numbered, depth=3, openlevel=1]{bookmark}
+
+\geometry{
+	paperwidth = 210mm,
+	paperheight = 297mm,
+	left = 3cm,
+	top = 2cm,
+	right = 1cm,
+	bottom = 2cm,
+	footskip = 1cm,
+	mag = 1000,
+	a4paper
+}
+
+\IfFontExistsTF{Times New Roman}{%
+	\setmainfont{Times New Roman}%
+}{\IfFontExistsTF{Liberation Serif}{%
+	\setmainfont{Liberation Serif}%
+}{\IfFontExistsTF{Times}{%
+	\setmainfont{Times}%
+}}}
+
+\IfFontExistsTF{Liberation Mono}{%
+	\setmonofont{Liberation Mono}%
+}{\IfFontExistsTF{Courier New}{%
+	\setmonofont{Courier New}%
+}{\IfFontExistsTF{Courier}{%
+	\setmonofont{Courier}%
+}{\IfFontExistsTF{Consolas}{%
+	\setmonofont{Consolas}%
+}{\IfFontExistsTF{Hack}{%
+	\setmonofont{Hack}%
+}}}}}
+
+\IfFontExistsTF{Arial}{%
+	\setsansfont{Arial}%
+}{\IfFontExistsTF{Liberation Sans}{%
+	\setsansfont{Liberation Sans}%
+}{\IfFontExistsTF{Helvetica}{%
+	\setsansfont{Helvetica}%
+}{\IfFontExistsTF{FreeSans}{%
+	\setsansfont{FreeSans}%
+}{\IfFontExistsTF{TeX Gyre Heros}{%
+	\setsansfont{TeX Gyre Heros}%
+}}}}}
+
+\pagestyle{plain}
+\fancyhf{}
+\fancyfoot[R]{\thepage}
+\fancypagestyle{plain}{%
+    \renewcommand{\headrulewidth}{\z@}%
+    \fancyhf{}%
+    \fancyfoot[R]{\thepage}%
+}
+
+\hbadness=10000
+
+\captionsetup[figure]
+{
+	name={Рисунок},
+	font={normal},%
+	justification={centering},%
+	labelsep={endash},%
+	labelformat=simple,%
+	figurewithin=none
+}
+\captionsetup[table]
+{
+	name={Таблица},
+	font={normal},%
+	justification={justified},%
+	labelsep={endash},%
+	labelformat=simple,%
+	figurewithin=none,
+	singlelinecheck=false
+}
+
+\AtBeginDocument{%
+%algorithm2e redefinition in case it is used
+\def\algocf@captiontext#1#2{Алгоритм \thealgocf{} -- \AlCapNameFnt{}#2}
+}
+
+\newdimen\sw@parindent\sw@parindent1.25cm
+\newskip\sw@parskip\sw@parskip\z@ plus1em minus 0.1em
+\newcount\sw@secsecvpenalty\sw@secsecvpenalty\@highpenalty
+
+\AtBeginEnvironment{table}{\Large}
+
+\counterwithout{equation}{section} % undo numbering system provided by phstyle.cls
+%\counterwithin{equation}{chapter}  % implement desired numbering system
+
+\renewcommand\cfttoctitlefont{\normalfont}
+%\renewcommand\cftchapfont{\normalfont}
+%\renewcommand\cftchappagefont{\normalfont}
+\renewcommand\cftsecpagefont{\normalfont}
+\renewcommand\cftsecfont{\normalfont}
+\setlength\cftbeforetoctitleskip{-1em}
+\setlength\cftaftertoctitleskip{-1em}
+\renewcommand\cftparskip{\z@}
+%\renewcommand{\cftchapleader}{\cftdotfill{0}}
+\renewcommand{\cftsecleader}{\cftdotfill{0}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{0}}
+\renewcommand{\cftmarktoc}{}
+\setcounter{tocdepth}{2}
+%\cftsetindents{section}{\z@}{\z@}
+%\cftsetindents{subsection}{\z@}{\z@}
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+
+\def\fps@figure{htbp}
+\def\fps@table{htbp}
+\setcounter{totalnumber}{5}
+\setcounter{topnumber}{5}
+\renewcommand{\topfraction}{.9}
+\renewcommand{\textfraction}{.1}
+\renewcommand{\bottomfraction}{.9}
+\renewcommand{\floatpagefraction}{0.8}
+
+\AtBeginDocument{%
+	\renewcommand\contentsname{ОГЛАВЛЕНИЕ}
+	\let\@toc\tableofcontents
+	\renewcommand\tableofcontents{\@toc\thispagestyle{empty}\clearpage}
+}
+
+\pdfstringdefDisableCommands{%
+	\def\XeLaTeX{XeLaTeX}
+}
+
+\ExplSyntaxOn
+\cs_new_protected:Nn \remove_trailing_period:N {
+	\regex_replace_once:nnN {(.*)\.$} {\1} #1
+}
+\NewDocumentCommand{\removetrailingperiod}{m} {
+	\tl_set:Nn \l_tmpa_tl {#1}
+	\remove_trailing_period:N \l_tmpa_tl
+	\tl_use:N \l_tmpa_tl
+}
+
+\newif\if@sm@aftersection\@sm@aftersectionfalse
+
+\def\sm@addsection#1{
+	\textbf{#1}
+	\parindent\sw@parindent
+	\par\nobreak\@afterheading
+}
+
+\NewDocumentCommand{\sm@section}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\remove_trailing_period:N \l_tmpa_tl
+
+	\ifhmode\par\fi
+	\addvspace{2ex plus 1ex minus 1ex}
+	\if@sm@aftersection\penalty\sw@secsecvpenalty\fi
+	\parindent\z@
+	\IfBooleanTF{#1}{
+		\addcontentsline{toc}{section}{\tl_use:N \l_tmpa_tl}
+		\sm@addsection{\tl_use:N \l_tmpa_tl}
+	}{
+		\refstepcounter{section}
+		\addcontentsline{toc}{section}{\protect{\thesection}\ \tl_use:N \l_tmpa_tl}
+		\sm@addsection{\hbox to 1cm{\protect{\thesection}}\tl_use:N \l_tmpa_tl}
+	}
+	\IfValueT{#2}{\label{#2}}
+	\@sm@aftersectiontrue\everypar{\@sm@aftersectionfalse\everypar{}}
+	\vskip1ex plus 0.5ex minus 0.5ex
+}
+
+%\section[label]{Title}
+\RenewDocumentCommand{\section}{}{\sm@section}
+
+\def\sm@addsubsection#1{
+	\textbf{#1}
+	\parindent\sw@parindent
+	\par\nobreak\@afterheading
+}
+
+\NewDocumentCommand{\sm@subsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
+	\remove_trailing_period:N \l_tmpa_tl
+
+	\ifhmode\par\fi
+	\addvspace{1ex plus 0.5ex minus 0.5ex}
+	\if@sm@aftersection\penalty\sw@secsecvpenalty\fi
+	\parindent\z@
+	\IfBooleanTF{#1}{
+		\addcontentsline{toc}{subsection}{\tl_use:N \l_tmpa_tl}
+		\sm@addsubsection{\tl_use:N \l_tmpa_tl}
+	}{
+		\refstepcounter{subsection}
+		\addcontentsline{toc}{subsection}{\protect{\thesubsection}\ \tl_use:N \l_tmpa_tl}
+		\sm@addsubsection{\protect{\thesubsection}.\ \tl_use:N \l_tmpa_tl}
+	}
+	\IfValueT{#2}{\label{#2}}
+	\@sm@aftersectiontrue\everypar{\@sm@aftersectionfalse\everypar{}}
+	\vskip1ex plus 0.5ex minus 0.5ex
+}
+
+%\subsection[label]{Title}
+\RenewDocumentCommand{\subsection}{}{\sm@subsection}
+
+\def\sm@addsubsubsection#1{
+	\textbf{\textit{#1}}
+	\parindent\sw@parindent
+	\vadjust{\nobreak\@afterheading}
+}
+
+\NewDocumentCommand{\sm@subsubsection}{som}{
+	\tl_set:Nn \l_tmpa_tl {#3}
+	\regex_replace_all:nnN {"(.*)"}{«\1»} \l_tmpa_tl
+	\regex_replace_once:nnN {\ +$}{} \l_tmpa_tl
+	\tl_set_eq:NN \l_tmpb_tl \l_tmpa_tl
+	\remove_trailing_period:N \l_tmpa_tl
+
+	\ifhmode\par\fi
+	\addvspace{0.5em plus 0.4em minus 0.4em}
+	\if@sm@aftersection\penalty\sw@secsecvpenalty\fi
+	\parindent\z@
+	\IfBooleanTF {#1} {
+		\addcontentsline{toc}{subsubsection}{\tl_use:N \l_tmpa_tl}
+		\sm@addsubsubsection{\tl_use:N \l_tmpb_tl}
+	}{
+		\refstepcounter{subsubsection}
+		\addcontentsline{toc}{subsubsection}{\protect{\thesubsubsection}\ \tl_use:N \l_tmpa_tl}
+		\sm@addsubsubsection{\protect{\thesubsubsection}.\ \tl_use:N \l_tmpb_tl}
+	}
+	\@sm@aftersectiontrue\everypar{\@sm@aftersectionfalse\everypar{}}
+	\IfValueT{#2}{\label{#2}}
+}
+
+%\subsubsection[label]{Title}
+\RenewDocumentCommand{\subsubsection}{}{\sm@subsubsection}
+\ExplSyntaxOff
+
+\let\ttfamily@old\ttfamily
+\newcommand{\ttfamily@set}[2]{\renewcommand{\ttfamily}{\ttfamily@old\fontsize{#1}{#2}\selectfont}}
+
+\def\tiny{\fontsize{7pt}{9pt}\selectfont\ttfamily@set{6pt}{9pt}}
+\def\scriptsize{\fontsize{8pt}{10pt}\selectfont\ttfamily@set{7pt}{10pt}}
+\def\footnotesize{\fontsize{9pt}{11pt}\selectfont\ttfamily@set{8pt}{11pt}}
+\def\small{\fontsize{12pt}{14pt}\selectfont\ttfamily@set{9pt}{14pt}}
+\def\normalsize{\fontsize{14pt}{16pt}\selectfont\ttfamily@set{12pt}{16pt}}
+\def\large{\fontsize{17.28pt}{19pt}\selectfont\ttfamily@set{14pt}{19pt}}
+
+\newcounter{itemlistctr}
+\newcommand{\makenumlabel}[1]{#1.\hfill}
+\newenvironment{itemlist}%
+{%
+	\begin{list}%
+    {\arabic{itemlistctr}}%
+    {\usecounter{itemlistctr}%
+     \setlength{\labelwidth}{1cm}%
+     \setlength{\labelsep}{0cm}%
+     \setlength{\leftmargin}{\z@}%
+     \setlength{\rightmargin}{\z@}%
+     \setlength{\itemindent}{2cm}%
+     \setlength{\itemsep}{\z@}%
+     \setlength{\parsep}{\z@}%
+     \setlength{\parskip}{\sw@parskip}%
+     \setlength{\partopsep}{\z@}%
+     \let\makelabel=\makenumlabel%
+    }%
+}%
+{\end{list}}
+
+\DeclareNameAlias{author}{family-given}
+\DeclareSourcemap{
+	\maps[datatype=bibtex]{
+		\map[overwrite]
+		{
+			\step[fieldsource=author, match=\regexp{^[А-Яа-я].+}, final]
+			\step[fieldset=presort, fieldvalue=1, append]
+		}
+		\map[overwrite]
+		{
+			\step[notfield=author, final]
+			\step[fieldsource=title, match=\regexp{^[А-Яа-я].+}, final]
+			\step[fieldset=presort, fieldvalue=1, append]
+		}
+		\map[overwrite]
+		{
+			\step[fieldsource=author, match=\regexp{^[A-Za-z].+}, final]
+			\step[fieldset=presort, fieldvalue=2, append]
+		}
+		\map[overwrite]
+		{
+			\step[notfield=author, final]
+			\step[fieldsource=title, match=\regexp{^[A-Za-z].+}, final]
+			\step[fieldset=presort, fieldvalue=2, append]
+		}
+	}
+}
+\defbibenvironment{bibliography}{\begin{itemlist}}{\end{itemlist}}{\item}%
+\renewbibmacro*{url}{\printfield[url]{urlraw}}
+
+\input{details/masterspecialties.def}
+\input{details/barchelorspecialties.def}
+
+\ExplSyntaxOn
+\tl_new:N \tl_specialty_code
+\tl_new:N \tl_specialty_description
+\NewDocumentCommand{\@specialtycode}{}{\tl_use:N \tl_specialty_code}
+\NewDocumentCommand{\@specialtydescription}{}{\tl_use:N \tl_specialty_description}
+
+%\@setspecialty{12.34.56}[Description]
+\NewDocumentCommand{\@setspecialty}{mo}{
+	\tl_set:Nn \tl_specialty_code {#1}
+	\IfValueTF{#2}{
+		\tl_set:Nn \tl_specialty_description {#2}
+	}{
+		\decode_barchelor_specialty:Nn \tl_specialty_description {#1}
+		\str_if_empty:NT \tl_specialty_description {
+			\decode_master_specialty:Nn \tl_specialty_description {#1}
+			\str_if_empty:NT \tl_specialty_description {
+				\tl_set:Nn \tl_specialty_description {
+					\todo{НЕИЗВЕСТНАЯ\ СПЕЦИАЛЬНОСТЬ\ #1}
+				}
+			}
+		}
+	}
+}
+
+%#1 - degree, #2 - rank, #4 - employment
+\NewDocumentCommand{\@makeshorttitles}{ m m m }
+{
+	\seq_clear:N \l_tmpa_seq
+	\tl_set:Nx \l_tmpa_tl {#3}
+	\tl_if_empty:NF \l_tmpa_tl {\abbreviate_employment:N \l_tmpa_tl \seq_put_right:NV \l_tmpa_seq { \l_tmpa_tl } }
+	\tl_set:Nx \l_tmpa_tl {#1}
+	\tl_if_empty:NF \l_tmpa_tl {\abbreviate_degree_short:N \l_tmpa_tl \seq_put_right:NV \l_tmpa_seq { \l_tmpa_tl } }
+	\tl_set:Nx \l_tmpa_tl {#2}
+	\tl_if_empty:NF \l_tmpa_tl {\abbreviate_rank_short:N \l_tmpa_tl \seq_put_right:NV \l_tmpa_seq { \l_tmpa_tl } }
+	\seq_use:Nn \l_tmpa_seq {,~}
+}
+
+%#1 - degree, #2 - rank, #4 - employment
+\NewDocumentCommand{\@makelongtitles}{ m m m }
+{
+	\seq_clear:N \l_tmpa_seq
+	\tl_set:Nx \l_tmpa_tl {#3}
+	\tl_if_empty:NF \l_tmpa_tl {\abbreviate_employment:N \l_tmpa_tl \seq_put_right:NV \l_tmpa_seq { \l_tmpa_tl } }
+	\tl_set:Nx \l_tmpa_tl {#1}
+	\tl_if_empty:NF \l_tmpa_tl {\abbreviate_degree_long:N \l_tmpa_tl \seq_put_right:NV \l_tmpa_seq { \l_tmpa_tl } }
+	\tl_set:Nx \l_tmpa_tl {#2}
+	\tl_if_empty:NF \l_tmpa_tl {\abbreviate_rank_long:N \l_tmpa_tl \seq_put_right:NV \l_tmpa_seq { \l_tmpa_tl } }
+	\seq_use:Nn \l_tmpa_seq {,~}
+}
+\ExplSyntaxOff
+
+\AtBeginDocument{%
+	\parindent\sw@parindent
+	\parskip\sw@parskip
+}
