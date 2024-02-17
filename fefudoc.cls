@@ -7,6 +7,8 @@
 \def\@SpecifyDocumentType#1#2{\DeclareOption{#2}{\gdef\@baseclass{#1}\ifx\@documenttype\@emptytoken\def\@documenttype{#2}\else\ClassError{fefudoc}{Only one document type may be specified}{}\fi}}
 \@SpecifyDocumentType{details/reportv1}{report v1}\relax
 \@SpecifyDocumentType{details/reportv1}{report}\relax
+\@SpecifyDocumentType{details/labworkv1}{labwork v1}\relax
+\@SpecifyDocumentType{details/labworkv1}{labwork}\relax
 \@SpecifyDocumentType{details/masterthesisv1}{master thesis v1}\relax
 \@SpecifyDocumentType{details/masterthesisv1}{master thesis}\relax
 \@SpecifyDocumentType{details/barchelorthesisv1}{barchelor thesis v1}\relax
@@ -43,6 +45,10 @@
 	\ClassInfo{fefudoc}{Тип документа ДВФУ: реферат доклада, версия 1.}
 }{report}{
 	\ClassInfo{fefudoc}{Тип документа ДВФУ: реферат доклада, последняя версия.}
+}{labwork v1}{
+	\ClassInfo{fefudoc}{Тип документа ДВФУ: отчет по лабораторной работе, версия 1.}
+}{labwork}{
+	\ClassInfo{fefudoc}{Тип документа ДВФУ: отчет по лабораторной работе, последняя версия.}
 }{master thesis v1}{
 	\ClassInfo{fefudoc}{Тип документа ДВФУ: магистерская ВКР, версия 1.}
 }{master thesis}{
